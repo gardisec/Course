@@ -18,23 +18,43 @@
             <div class="form-group">
                 <label for="password">Пароль</label>
                 <input type="password" id="password" name="password" required>
-                <label for="passwordConf">Подтверждение пароля</label>
-                <input type="passwordConf" id="passwordConf" name="passwordConf" required>
             </div>
+
+            <div class="form-group hidden" id="passwordConfGroup" style="display: none;">
+                <label for="passwordConf">Подтверждение пароля</label>
+                <input type="password" id="passwordConf" name="passwordConf">
+            </div>
+
             <button type="submit">Зарегистрироваться</button>
         </form>
-        <div class="error-message" id="errorMessage"></div>
-        <div class="success-message" id="successMessage"></div>
+        <div class="notification error" id="errorMessage"></div>
+        <div class="notification success" id="successMessage"></div>
         <p style="text-align: center; margin-top: 15px;">
             <a href="/" style="color: #007bff; text-decoration: none;">Вернуться к авторизации</a>
         </p>
     </div>
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        const registerForm = document.getElementById('registerForm');
+        const passwordField = document.getElementById('password');
+        const passwordConfField = document.getElementById('passwordConf');
+        const passwordConfGroup = document.getElementById('passwordConfGroup');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        passwordField.addEventListener('input', () => {
+            if (passwordField.value.length > 0) {
+                passwordConfGroup.style.display = 'block';
+            } else {
+                passwordConfGroup.style.display = 'none';
+                passwordConfField.value = '';
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const passwordConf = document.getElementById('passwordConf').value;
+            const password = passwordField.value;
+            const passwordConf = passwordConfField.value;
 
             const response = await fetch('/register', {
                 method: 'POST',
@@ -44,12 +64,18 @@
 
             const result = await response.json();
             if (result.success) {
-                document.getElementById('successMessage').textContent = result.message;
-                document.getElementById('errorMessage').textContent = '';
-                
+                successMessage.textContent = result.message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+                if (result.redirect) {
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 2000);
+                }
             } else {
-                document.getElementById('errorMessage').textContent = result.message;
-                document.getElementById('successMessage').textContent = '';
+                errorMessage.textContent = result.message;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
             }
         });
     </script>

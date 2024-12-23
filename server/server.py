@@ -89,7 +89,7 @@ def register():
 
     if not username or not password:
         return jsonify({'success': False, 'message': 'Имя пользователя и пароль обязательны.'})
-    if (username.len() > 32 or username.len() < 4):
+    if (len(username) > 32 or len(username) < 4):
         return jsonify({'success': False, 'message': 'Длина вашего имени пользователя не должна быть не менее 4 и не более 32'})
     if (username == " "):
         return jsonify({'success': False, 'message': 'Имя пользователя не должно быть пустым'})
@@ -215,7 +215,7 @@ def add_product():
     price = data.get('price')
     city = data.get('city')
     store = data.get('store')
-    if name.len() < 1:
+    if len(name) < 1:
         return jsonify({'success': False, 'message': 'Название товара некорректно'})
     if quantity < 0:
         return jsonify({'success': False, 'message': 'Количество товара некорректное'})
