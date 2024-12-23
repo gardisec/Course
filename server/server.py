@@ -117,7 +117,7 @@ def register():
         session['role_id'] = role_id
 
         if role_id ==1:
-            return jsonify({'success': True, 'redirect': '/admin'})
+            return jsonify({'success': True, 'redirect': '/admin', 'message': f'Успешно'})
         
     except Exception as e:
         return jsonify({'success': False, 'message': f'Ошибка сервера'})
@@ -210,30 +210,48 @@ def get_store_locations():
 @app.route('/add_product', methods=['POST'])
 def add_product():
     data = request.json
-    name = data.get('name')
-    quantity = data.get('quantity')
-    price = data.get('price')
-    city = data.get('city')
-    store = data.get('store')
-    if len(name) < 1:
-        return jsonify({'success': False, 'message': 'Название товара некорректно'})
+    name = data.get('name', '').strip()
+    try:
+        quantity = int(data.get('quantity', -1))
+        price = float(data.get('price', -1))
+        store = int(data.get('store', -1))
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'message': 'Цена и количество товара должны быть числами.'})
+
+    city = data.get('city', '').strip()
+
+    # Валидация данных
+    if not name:
+        return jsonify({'success': False, 'message': 'Название товара некорректно.'})
     if quantity < 0:
-        return jsonify({'success': False, 'message': 'Количество товара некорректное'})
+        return jsonify({'success': False, 'message': 'Количество товара некорректное.'})
     if price < 0:
-        return jsonify({'success': False, 'message': 'Цена за товар не может быть меньше чем 0'})
+        return jsonify({'success': False, 'message': 'Цена за товар не может быть меньше 0.'})
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+
+        # Проверка существования пары (city, store) в таблице store_locations
+        cur.execute(
+            "SELECT 1 FROM store_locations WHERE city = %s AND store = %s",
+            (city, store)
+        )
+        if not cur.fetchone():
+            return jsonify({'success': False, 'message': 'Указанный город и склад не существуют.'})
+
+        # Вставка товара
         cur.execute(
             "INSERT INTO products (name, quantity, purchase_price, city, store) VALUES (%s, %s, %s, %s, %s)",
             (name, quantity, price, city, store)
         )
         conn.commit()
-        return jsonify({'success': True, 'message': 'Товар успешно добавлен'})
+        return jsonify({'success': True, 'message': 'Товар успешно добавлен.'})
     except Exception as e:
-        return jsonify({'success': False, 'message': 'Ошибка при добавлении товара'})
+        return jsonify({'success': False, 'message': 'Ошибка при добавлении товара.'})
     finally:
         conn.close()
+
 
 # Удаление товара полностью
 @app.route('/delete_product/<int:product_id>', methods=['POST'])

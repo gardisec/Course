@@ -600,13 +600,14 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
             document.getElementById('filterPriceMax').value = '';
             loadProducts(); 
         });
+        
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('productName').value;
-            const quantity = document.getElementById('productQuantity').value;
-            const price = document.getElementById('productPrice').value;
+            const name = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('productQuantity').value, 10);
+            const price = parseFloat(document.getElementById('productPrice').value);
             const city = document.getElementById('productCity').value;
-            const store = document.getElementById('productStore').value;
+            const store = parseInt(document.getElementById('productStore').value, 10);
 
             const response = await fetch('/add_product', {
                 method: 'POST',
@@ -614,9 +615,10 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                 body: JSON.stringify({ name, quantity, price, city, store })
             });
 
+            const result = await response.json(); // Парсим ответ
             if (result.success) {
                 alert(result.message);
-                loadProducts();
+                loadProducts(); // Перезагрузка списка товаров
             } else {
                 alert(result.message);
             }
