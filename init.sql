@@ -1,6 +1,6 @@
 CREATE SEQUENCE IF NOT EXISTS roles_id_seq;
 CREATE SEQUENCE IF NOT EXISTS products_id_seq;
-CREATE SEQUENCE IF NOT EXISTS user_id_seq;
+CREATE SEQUENCE IF NOT EXISTS users_id_seq;
 CREATE SEQUENCE IF NOT EXISTS audit_log__id_seq;
 
 CREATE TABLE IF NOT EXISTS public.store_locations
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS public.store_locations
     city text COLLATE pg_catalog."default" NOT NULL,
     store integer NOT NULL,
     CONSTRAINT unique_city_store UNIQUE (city, store)
-)
+);
 
 CREATE TABLE IF NOT EXISTS public.roles
 (
