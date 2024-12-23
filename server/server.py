@@ -68,14 +68,12 @@ def login():
 
             if role_id ==1:
                 return jsonify({'success': True, 'redirect': '/admin'})
-            elif role_id == 1:
-                return jsonify({'success': True, 'redirect': '/user'})
             else:
                 return jsonify({'success': False, 'message': 'Нет доступа.'})
         else:
             return jsonify({'success': False, 'message': 'Неверное имя пользователя или пароль.'})
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера'})
+        return jsonify({'success': False, 'message': f'Ошибка'})
     finally:
         if conn:
             conn.close()
@@ -87,10 +85,16 @@ def register():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    passwordConf = data.get('passwordConf')
 
     if not username or not password:
         return jsonify({'success': False, 'message': 'Имя пользователя и пароль обязательны.'})
-
+    if (username.len() > 32 or username.len() < 4):
+        return jsonify({'success': False, 'message': 'Длина вашего имени пользователя не должна быть не менее 4 и не более 32'})
+    if (username == " "):
+        return jsonify({'success': False, 'message': 'Имя пользователя не должно быть пустым'})
+    if (passwordConf != password):
+        return jsonify({'success': False, 'message': 'Пароли не совпадают'})
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -102,15 +106,19 @@ def register():
 
         # Хэшируем пароль
         hashed_password = generate_password_hash(password)
-
-        # Добавляем пользователя с ролью role_id = 777
+        role_id = 1
+        # Добавляем пользователя с ролью role_id = 1
         cur.execute(
             "INSERT INTO users (username, password_hash, role_id) VALUES (%s, %s, %s)",
-            (username, hashed_password, 1)
+            (username, hashed_password, role_id)
         )
         conn.commit()
+        session['username'] = username
+        session['role_id'] = role_id
 
-        return jsonify({'success': True, 'message': 'Пользователь успешно зарегистрирован.'})
+        if role_id ==1:
+            return jsonify({'success': True, 'redirect': '/admin'})
+        
     except Exception as e:
         return jsonify({'success': False, 'message': f'Ошибка сервера'})
     finally:
@@ -207,7 +215,12 @@ def add_product():
     price = data.get('price')
     city = data.get('city')
     store = data.get('store')
-
+    if name.len() < 1:
+        return jsonify({'success': False, 'message': 'Название товара некорректно'})
+    if quantity < 0:
+        return jsonify({'success': False, 'message': 'Количество товара некорректное'})
+    if price < 0:
+        return jsonify({'success': False, 'message': 'Цена за товар не может быть меньше чем 0'})
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -216,7 +229,9 @@ def add_product():
             (name, quantity, price, city, store)
         )
         conn.commit()
-        return '', 201
+        return jsonify({'success': True, 'message': 'Товар успешно добавлен'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': 'Ошибка при добавлении товара'})
     finally:
         conn.close()
 

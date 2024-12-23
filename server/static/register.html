@@ -17,6 +17,8 @@
             <div class="form-group">
                 <label for="password">Пароль</label>
                 <input type="password" id="password" name="password" required>
+                <label for="passwordConf">Пароль</label>
+                <input type="password" id="passwordConf" name="passwordConf" required>
             </div>
             <button type="submit">Зарегистрироваться</button>
         </form>
@@ -31,20 +33,19 @@
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
+            const passwordConf = document.getElementById('passwordConf').value;
 
             const response = await fetch('/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
+                body: JSON.stringify({ username, password, passwordConf })
             });
 
             const result = await response.json();
             if (result.success) {
                 document.getElementById('successMessage').textContent = result.message;
                 document.getElementById('errorMessage').textContent = '';
-                setTimeout(() => {
-                    window.location.href = '/admin';
-                }, 2000); // Перенаправление через 2 секунды
+                
             } else {
                 document.getElementById('errorMessage').textContent = result.message;
                 document.getElementById('successMessage').textContent = '';
