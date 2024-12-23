@@ -1,7 +1,6 @@
 CREATE SEQUENCE IF NOT EXISTS roles_id_seq;
 CREATE SEQUENCE IF NOT EXISTS products_id_seq;
 CREATE SEQUENCE IF NOT EXISTS users_id_seq;
-CREATE SEQUENCE IF NOT EXISTS audit_log__id_seq;
 
 CREATE TABLE IF NOT EXISTS public.store_locations
 (
