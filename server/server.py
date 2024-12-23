@@ -24,10 +24,9 @@ def get_db_connection():
 def login_page():
     if 'username' in session:
         role = session.get('role_id')
-        if role == 777:
+        if role == 1:
             return redirect(url_for('admin_page'))
-        elif role == 1:
-            return redirect(url_for('user_page'))
+        
     return send_from_directory('static', 'login.html')
 
 @app.route('/register')
@@ -36,7 +35,7 @@ def register_page():
 
 @app.route('/admin')
 def admin_page():
-    if 'username' in session and session.get('role_id') == 777:
+    if 'username' in session and session.get('role_id') == 1:
         return render_template('admin.html', username=session.get('username'))
     return redirect(url_for('login_page'))
 
@@ -76,7 +75,7 @@ def login():
         else:
             return jsonify({'success': False, 'message': 'Неверное имя пользователя или пароль.'})
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'})
+        return jsonify({'success': False, 'message': f'Ошибка сервера'})
     finally:
         if conn:
             conn.close()
@@ -113,7 +112,7 @@ def register():
 
         return jsonify({'success': True, 'message': 'Пользователь успешно зарегистрирован.'})
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'})
+        return jsonify({'success': False, 'message': f'Ошибка сервера'})
     finally:
         if conn:
             conn.close()
@@ -349,7 +348,7 @@ def change_store(product_id):
 
         return jsonify({'success': True, 'message': 'Склад успешно обновлен.'})
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': f'Ошибка сервера'}), 500
     finally:
         if conn:
             conn.close()
@@ -457,7 +456,7 @@ def get_users():
             for user in users
         ])
     except Exception as e:
-        return jsonify({"error": f"Ошибка сервера: {str(e)}"}), 500
+        return jsonify({"error": f"Ошибка сервера"}), 500
     finally:
         if conn:
             conn.close()
@@ -506,20 +505,20 @@ def export_data():
                     download_name='products.csv'
                 )
             except Exception as e:
-                return jsonify({'error': f'Ошибка при генерации CSV: {str(e)}'}), 500
+                return jsonify({'error': f'Ошибка при генерации CSV'}), 500
 
         else:
             return jsonify({'error': 'Неподдерживаемый формат данных'}), 400
 
     except Exception as e:
-        return jsonify({'error': f'Общая ошибка сервера: {str(e)}'}), 500
+        return jsonify({'error': f'Общая ошибка сервера'}), 500
 
     finally:
         try:
             if conn:
                 conn.close()
         except Exception as e:
-            print(f'Ошибка при закрытии соединения с базой данных: {str(e)}')
+            print(f'Ошибка при закрытии соединения с базой данных')
 
 @app.route('/add_store', methods=['POST'])
 def add_store():
@@ -571,7 +570,7 @@ def delete_store():
         return '', 204  # Успешный запрос, но тело ответа пустое
     except Exception as e:
         conn.rollback()
-        return jsonify({'error': 'Ошибка при удалении', 'details': str(e)}), 500
+        return jsonify({'error': 'Ошибка при удалении'}), 500
     finally:
         conn.close()
 
@@ -613,7 +612,7 @@ def update_product_store():
 
         return jsonify({"message": "Склад обновлен успешно."}), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Ошибка"}), 500
     finally:
         conn.close()
 
