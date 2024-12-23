@@ -107,7 +107,7 @@ def register():
         # Добавляем пользователя с ролью role_id = 777
         cur.execute(
             "INSERT INTO users (username, password_hash, role_id) VALUES (%s, %s, %s)",
-            (username, hashed_password, 777)
+            (username, hashed_password, 1)
         )
         conn.commit()
 
