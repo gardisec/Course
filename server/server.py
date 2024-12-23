@@ -67,7 +67,7 @@ def login():
             session['username'] = username
             session['role_id'] = role_id
 
-            if role_id == 777:
+            if role_id ==1:
                 return jsonify({'success': True, 'redirect': '/admin'})
             elif role_id == 1:
                 return jsonify({'success': True, 'redirect': '/user'})

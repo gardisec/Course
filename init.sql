@@ -2,19 +2,19 @@ CREATE SEQUENCE IF NOT EXISTS roles_id_seq;
 CREATE SEQUENCE IF NOT EXISTS products_id_seq;
 CREATE SEQUENCE IF NOT EXISTS users_id_seq;
 
-CREATE TABLE IF NOT EXISTS public.store_locations
-(
-    city text COLLATE pg_catalog."default" NOT NULL,
-    store integer NOT NULL,
-    CONSTRAINT unique_city_store UNIQUE (city, store)
-);
-
 CREATE TABLE IF NOT EXISTS public.roles
 (
     id integer NOT NULL DEFAULT nextval('roles_id_seq'::regclass),
     name text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT roles_pkey PRIMARY KEY (id),
     CONSTRAINT roles_name_key UNIQUE (name)
+);
+
+CREATE TABLE IF NOT EXISTS public.store_locations
+(
+    city text COLLATE pg_catalog."default" NOT NULL,
+    store integer NOT NULL,
+    CONSTRAINT unique_city_store UNIQUE (city, store)
 );
 
 CREATE TABLE IF NOT EXISTS public.products
@@ -51,3 +51,9 @@ CREATE TABLE IF NOT EXISTS public.users
         ON DELETE CASCADE
 );
 
+CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store);
+CREATE INDEX IF NOT EXISTS idx_products_city_store ON public.products (city, store);
+CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users (role_id);
+
+INSERT INTO public.roles (name) VALUES ('admin')
+ON CONFLICT (name) DO NOTHING;
