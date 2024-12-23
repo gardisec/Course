@@ -52,20 +52,3 @@ CREATE TABLE IF NOT EXISTS public.users
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.audit_log
-(
-    id integer NOT NULL DEFAULT nextval('audit_log_id_seq'::regclass),
-    user_id integer NOT NULL,
-    action character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    product_id integer,
-    "timestamp" timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT audit_log_pkey PRIMARY KEY (id),
-    CONSTRAINT audit_log_product_id_fkey FOREIGN KEY (product_id)
-        REFERENCES public.products (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE SET NULL,
-    CONSTRAINT audit_log_user_id_fkey FOREIGN KEY (user_id)
-        REFERENCES public.users (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
-);
