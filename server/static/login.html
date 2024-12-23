@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Авторизация</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Войти</button>
+        </form>
+        <div class="error-message" id="errorMessage"></div>
+        <p style="text-align: center; margin-top: 15px;">
+            <a href="/register" style="color: #007bff; text-decoration: none;">Регистрация</a>
+        </p>
+    </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    window.location.href = result.redirect; 
+                } else {
+                    document.getElementById('errorMessage').textContent = result.message;
+                }
+            } catch (err) {
+                console.error('Ошибка запроса:', err);
+                document.getElementById('errorMessage').textContent = 'Ошибка соединения с сервером.';
+            }
+        });
+    </script>
+</body>
+</html>

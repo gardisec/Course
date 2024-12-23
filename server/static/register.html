@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Регистрация</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+        <p style="text-align: center; margin-top: 15px;">
+            <a href="/" style="color: #007bff; text-decoration: none;">Вернуться к авторизации</a>
+        </p>
+    </div>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById('successMessage').textContent = result.message;
+                document.getElementById('errorMessage').textContent = '';
+                setTimeout(() => {
+                    window.location.href = '/admin';
+                }, 2000); // Перенаправление через 2 секунды
+            } else {
+                document.getElementById('errorMessage').textContent = result.message;
+                document.getElementById('successMessage').textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
