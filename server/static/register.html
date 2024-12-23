@@ -20,9 +20,9 @@
                 <input type="password" id="password" name="password" required>
             </div>
 
-            <div class="form-group hidden" id="passwordConfGroup" style="display: none;">
+            <div class="form-group">
                 <label for="passwordConf">Подтверждение пароля</label>
-                <input type="password" id="passwordConf" name="passwordConf">
+                <input type="password" id="passwordConf" name="passwordConf" required>
             </div>
 
             <button type="submit">Зарегистрироваться</button>
@@ -35,26 +35,21 @@
     </div>
     <script>
         const registerForm = document.getElementById('registerForm');
-        const passwordField = document.getElementById('password');
-        const passwordConfField = document.getElementById('passwordConf');
-        const passwordConfGroup = document.getElementById('passwordConfGroup');
         const errorMessage = document.getElementById('errorMessage');
         const successMessage = document.getElementById('successMessage');
 
-        passwordField.addEventListener('input', () => {
-            if (passwordField.value.length > 0) {
-                passwordConfGroup.style.display = 'block';
-            } else {
-                passwordConfGroup.style.display = 'none';
-                passwordConfField.value = '';
-            }
-        });
-
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = passwordField.value;
-            const passwordConf = passwordConfField.value;
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const passwordConf = document.getElementById('passwordConf').value;
+
+            if (password !== passwordConf) {
+                errorMessage.textContent = 'Пароли не совпадают.';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
 
             const response = await fetch('/register', {
                 method: 'POST',
