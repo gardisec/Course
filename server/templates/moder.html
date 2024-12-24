@@ -243,8 +243,8 @@
                 return;
             }
 
-            if (price > 100000000){
-                alert('Количество товара не может превышать 1.000.000.00');
+            if (price > 1000000){
+                alert('Количество товара не может превышать 1.000.000');
                 return;
             }
             const response = await fetch('/add_product', {
