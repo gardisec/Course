@@ -4,16 +4,15 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background: linear-gradient(to bottom, #ffecd2, #ffe8d6); /* Плавный градиент */
+    background: #caf0d3; /* Плавный градиент */
     box-sizing: border-box;
     color: #333;
-    background-image: url('https://www.transparenttextures.com/patterns/snow.png'); /* Фон с узором снежинок */
 }
 
 /* Стили для боковой панели */
 .sidebar {
     width: 200px;
-    background-color: #036983; /* Темно-красный цвет */
+    background-color: linear-gradient(to bottom, #ffecd2, #ffe8d6); /* Темно-красный цвет */
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -38,9 +37,9 @@ body {
     width: 100%;
     margin: 10px 0;
     padding: 10px;
-    background-color: #008d18; /* Золотистый цвет */
+    background-color: #188d9c; /* Золотистый цвет */
     border: none;
-    color: #036983; /* Красный текст */
+    color: #ffecd2;/* Красный текст */
     text-align: center;
     cursor: pointer;
     border-radius: 10px;
@@ -49,7 +48,7 @@ body {
 }
 
 .sidebar button:hover, .logout-button:hover {
-    background-color: #00ff2a; /* Ярко-красный при наведении */
+    background-color: #dae4a3; /* Ярко-красный при наведении */
     transform: scale(1.04); /* Увеличение кнопок */
 }
 
