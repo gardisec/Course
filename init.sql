@@ -65,7 +65,7 @@ CREATE TABLE audit (
     CONSTRAINT fk_audit_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store);
+CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store_number);
 CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products (store_id);
 CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users (role_id);
 
