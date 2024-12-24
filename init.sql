@@ -16,9 +16,9 @@ CREATE TABLE IF NOT EXISTS public.store_locations
 (
     id integer NOT NULL DEFAULT nextval('store_locations_id_seq'::regclass),
     city text COLLATE pg_catalog."default" NOT NULL,
-    store_number integer NOT NULL,
+    store integer NOT NULL,
     CONSTRAINT store_locations_pkey PRIMARY KEY (id),
-    CONSTRAINT store_locations_city_store_number_key UNIQUE (city, store_number)
+    CONSTRAINT store_locations_city_store_number_key UNIQUE (city, store)
 );
 
 CREATE TABLE IF NOT EXISTS public.products
@@ -65,7 +65,7 @@ CREATE TABLE audit (
     CONSTRAINT fk_audit_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
-CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store_number);
+CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store);
 CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products (store_id);
 CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users (role_id);
 
