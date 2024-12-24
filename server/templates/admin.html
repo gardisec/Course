@@ -11,7 +11,7 @@
     
     <div class="sidebar">
         <h7>Добро пожаловать, {{username}}</h7>
-        
+        <button id="showAllContent">Главная</button>
         <button data-target="user-management">Управление пользователями</button>
         <button data-target="product-management">Управление товарами</button>
         <button data-target="new-points">Управление точками складов</button>
@@ -189,6 +189,17 @@
     </div>
     
     <script>
+            document.getElementById('showAllContent').addEventListener('click', function () {
+        // Получаем все контейнеры
+        const containers = document.querySelectorAll('.main-content .container');
+        
+        // Удаляем у всех класс active
+        containers.forEach(container => container.classList.remove('active'));
+        
+        // Добавляем ко всем класс active
+        containers.forEach(container => container.classList.add('active'));
+    });
+
         async function openEditStoreModal(productId) {
 
             document.getElementById('modalProductId').value = productId;
