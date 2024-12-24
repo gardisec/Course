@@ -45,7 +45,7 @@ def admin_page():
 
 @app.route('/user')
 def user_page():
-    if 'username' in session and session.get('role_id') == 1:
+    if 'username' in session and session.get('role_id') == 2:
         return send_from_directory('static', 'userpage.html')
     return redirect(url_for('login_page'))
 
@@ -117,7 +117,7 @@ def register():
         session['username'] = username
         session['role_id'] = default_role_id
 
-        return jsonify({'success': True, 'redirect': '/user', 'message': 'Успешная регистрация.'})
+        return jsonify({'success': True, 'redirect': '/admin', 'message': 'Успешная регистрация.'})
     except Exception as e:
         return jsonify({'success': False, 'message': 'Ошибка сервера.'})
     finally:
