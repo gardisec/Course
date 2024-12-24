@@ -1,6 +1,8 @@
 CREATE SEQUENCE IF NOT EXISTS roles_id_seq;
+CREATE SEQUENCE IF NOT EXISTS store_locations_id_seq;
 CREATE SEQUENCE IF NOT EXISTS products_id_seq;
 CREATE SEQUENCE IF NOT EXISTS users_id_seq;
+CREATE SEQUENCE IF NOT EXISTS audit_id_seq;
 
 CREATE TABLE IF NOT EXISTS public.roles
 (
@@ -12,9 +14,11 @@ CREATE TABLE IF NOT EXISTS public.roles
 
 CREATE TABLE IF NOT EXISTS public.store_locations
 (
+    id integer NOT NULL DEFAULT nextval('store_locations_id_seq'::regclass),
     city text COLLATE pg_catalog."default" NOT NULL,
-    store integer NOT NULL,
-    CONSTRAINT unique_city_store UNIQUE (city, store)
+    store_number integer NOT NULL,
+    CONSTRAINT store_locations_pkey PRIMARY KEY (id),
+    CONSTRAINT store_locations_city_store_number_key UNIQUE (city, store_number)
 );
 
 CREATE TABLE IF NOT EXISTS public.products
@@ -25,15 +29,14 @@ CREATE TABLE IF NOT EXISTS public.products
     purchase_price numeric(10,2) NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    city text COLLATE pg_catalog."default" NOT NULL,
-    store integer NOT NULL,
+    store_id integer NOT NULL,
     CONSTRAINT products_pkey PRIMARY KEY (id),
-    CONSTRAINT fk_products_store_locations FOREIGN KEY (city, store)
-        REFERENCES public.store_locations (city, store) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION,
-    CONSTRAINT products_purchase_price_check CHECK (purchase_price >= 0::numeric),
-    CONSTRAINT products_quantity_check CHECK (quantity >= 0)
+    CONSTRAINT products_store_id_fkey FOREIGN KEY (store_id)
+        REFERENCES public.store_locations (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+    CONSTRAINT products_quantity_check CHECK (quantity >= 0),
+    CONSTRAINT products_purchase_price_check CHECK (purchase_price >= 0::numeric)
 );
 
 CREATE TABLE IF NOT EXISTS public.users
@@ -44,11 +47,23 @@ CREATE TABLE IF NOT EXISTS public.users
     role_id integer NOT NULL,
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT users_pkey PRIMARY KEY (id),
+    CONSTRAINT unique_username UNIQUE (username),
     CONSTRAINT users_username_key UNIQUE (username),
     CONSTRAINT users_role_id_fkey FOREIGN KEY (role_id)
         REFERENCES public.roles (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE CASCADE
+);
+
+CREATE TABLE audit (
+    id SERIAL PRIMARY KEY, 
+    username TEXT NOT NULL, 
+    role_id INT NOT NULL, 
+    product_id INT NOT NULL, 
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    CONSTRAINT fk_audit_username FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
+    CONSTRAINT fk_audit_role_id FOREIGN KEY (role_id) REFERENCES users(role_id) ON DELETE CASCADE,
+    CONSTRAINT fk_audit_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store);
