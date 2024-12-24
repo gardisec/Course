@@ -4,41 +4,39 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background: #ffffff; /* Плавный градиент */
+    background-color :#a5a6a7; 
     box-sizing: border-box;
-    color: #333;
 }
 
 /* Стили для боковой панели */
 .sidebar {
     width: 200px;
-    background-color: #0d3572; /* Темно-красный цвет */
-    color: #fff;
+    background-color: #00566b;
+    color: #353535;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 20px;
     height: 100vh;
     position: fixed;
-    box-shadow: 8px 0 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 8px 0 10px rgba(0, 0, 0, 0.1); /* Тонкая чёрная тень */
 }
 
 .sidebar button, .logout-button {
     width: 100%;
     margin: 10px 0;
     padding: 10px;
-    background-color: #ffa00f; /* Золотистый цвет */
+    background-color: #cecece;
     border: none;
-    color: #ffffff;/* Красный текст */
+    color: #000000;
     text-align: center;
     cursor: pointer;
-    border-radius: 10px;
-    transition: transform 0.3s, background-color 0.3s;
-    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
 .sidebar button:hover, .logout-button:hover {
-    transform: scale(1.04); /* Увеличение кнопок */
+    transform: scale(1.04);
 }
 
 /* Основное содержимое */
@@ -46,21 +44,19 @@ body {
     margin-left: 200px;
     padding: 20px;
     width: 100%;
-    background: #ffffff; /* Мягкий градиент */
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1); /* Внутренние тени */
 }
 
 /* Контейнеры */
 .container {
-    justify-content: center;
+    justify-content: center; 
     display: none;
     margin: 20px auto;
     padding: 20px;
     max-width: 800px;
-    border: 1px solid #31312e; /* Золотая рамка */
+    border: 1px solid #ccc;
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
+    overflow-x: auto;
 }
 
 .container.active {
@@ -70,8 +66,7 @@ body {
 /* Заголовки */
 h2, h3, h4 {
     margin-top: 0;
-    color: #000000; /* Темно-красный */
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    color: #000000;
 }
 
 h7 {
@@ -106,15 +101,12 @@ th, td {
 }
 
 th {
-    background-color: #000000; /* Золотой цвет */
+    background-color: #ffffff;
     font-weight: bold;
-    color: #000000;
 }
 
 td {
-    background-color: rgba(255, 255, 255, 0.8);
-    color: #000000;
-    border: 1px solid #000000;
+    background-color: #ffffff;
 }
 
 /* Поля ввода и кнопки */
@@ -127,17 +119,17 @@ button {
     padding: 10px;
     width: 100%;
     max-width: 100%;
-    border: 1px solid #ffa00f;
+    border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
 button {
-    background-color: #ffa00f;
+    background-color: #047d9b;
     color: #fff;
-    border: 2px solid #0d3572;
+    border: none;
     cursor: pointer;
-    transition: transform 0.3s, background-color 0.3s;
+    transition: background-color 0.3s;
 }
 
 button:hover {
@@ -213,26 +205,4 @@ button:hover {
     display: flex;
     justify-content: space-between;
     margin-top: 10px;
-}
-
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('https://www.transparenttextures.com/patterns/snowflakes.png') repeat;
-    pointer-events: none;
-    z-index: 1;
-    animation: snowfall 15s linear infinite;
-}
-
-@keyframes snowfall {
-    0% {
-        background-position: 0 0;
-    }
-    100% {
-        background-position: 0 100%;
-    }
 }

@@ -3,6 +3,8 @@ import psycopg2
 from werkzeug.security import *
 import csv
 import io
+import openpyxl
+from openpyxl.styles import Font
 
 app = Flask(__name__)
 app.secret_key = 'abobaBOOBA' 
@@ -564,18 +566,49 @@ def export_data():
             rows = cur.fetchall()
             column_names = [desc[0] for desc in cur.description]
         except Exception as e:
-            return jsonify({'error': f'Ошибка при выполнении запроса к базе данных'}), 500
+            return jsonify({'error': 'Ошибка при выполнении запроса к базе данных'}), 500
 
         if not rows:
             return jsonify({'error': 'Нет данных для экспорта'}), 404
 
-        if format_type == 'csv':
+        if format_type == 'excel':
+            try:
+                # Создание Excel-файла
+                workbook = openpyxl.Workbook()
+                sheet = workbook.active
+                sheet.title = "Products"
+
+                # Добавляем заголовки
+                for col_num, column_name in enumerate(column_names, start=1):
+                    cell = sheet.cell(row=1, column=col_num)
+                    cell.value = column_name
+                    cell.font = Font(bold=True)
+
+                # Добавляем строки с данными
+                for row_num, row_data in enumerate(rows, start=2):
+                    for col_num, cell_value in enumerate(row_data, start=1):
+                        sheet.cell(row=row_num, column=col_num, value=cell_value)
+
+                # Сохранение в память
+                output = io.BytesIO()
+                workbook.save(output)
+                output.seek(0)
+
+                return send_file(
+                    output,
+                    mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    as_attachment=True,
+                    download_name='products.xlsx'
+                )
+            except Exception as e:
+                return jsonify({'error': 'Ошибка при генерации Excel'}), 500
+
+        elif format_type == 'csv':
             try:
                 output = io.StringIO()
                 writer = csv.writer(output)
 
                 writer.writerow(column_names)
-
                 writer.writerows(rows)
                 output.seek(0)
 
@@ -586,20 +619,20 @@ def export_data():
                     download_name='products.csv'
                 )
             except Exception as e:
-                return jsonify({'error': f'Ошибка при генерации CSV'}), 500
+                return jsonify({'error': 'Ошибка при генерации CSV'}), 500
 
         else:
             return jsonify({'error': 'Неподдерживаемый формат данных'}), 400
 
     except Exception as e:
-        return jsonify({'error': f'Общая ошибка сервера'}), 500
+        return jsonify({'error': 'Общая ошибка сервера'}), 500
 
     finally:
         try:
             if conn:
                 conn.close()
         except Exception as e:
-            print(f'Ошибка при закрытии соединения с базой данных')
+            print('Ошибка при закрытии соединения с базой данных')
 
 
 @app.route('/add_store', methods=['POST'])

@@ -5,7 +5,7 @@ ARG GID=10001
 
 RUN apt-get update && apt-get install -y logrotate
 COPY logrotate.conf /etc/logrotate.d/logrotate.conf
-RUN pip install flask psycopg2 werkzeug 
+RUN pip install flask psycopg2 werkzeug openpyxl
 
 WORKDIR /app
 

@@ -17,7 +17,6 @@
         <button data-target="new-points">Управление точками складов</button>
         <button data-target="export">Экспорт</button>
         <button class="logout-button" onclick="window.location.href='/logout';">Выход</button>
-
     </div>
 
     <div class="main-content">
@@ -578,7 +577,7 @@
         });
         
         document.getElementById('downloadCsvButton').addEventListener('click', () => {
-            fetch('/download-csv')
+            fetch('/download-csv?format=excel') // Изменяем параметр format на excel
                 .then(response => {
                     if (response.ok) {
                         return response.blob();
@@ -589,13 +588,15 @@
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'products.csv';
+                    a.download = 'products.xlsx'; // Изменяем название файла на Excel
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
                 })
                 .catch(error => alert(error.message));
         });
+        
+
         
         document.getElementById('addStore').addEventListener('submit', async (event) => {
             event.preventDefault();
