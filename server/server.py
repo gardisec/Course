@@ -44,7 +44,7 @@ def admin_page():
     return redirect(url_for('login_page'))
 
 @app.route('/moder')
-def admin_page():
+def moder_page():
     if 'username' in session and session.get('role_id') == 2:
         return render_template('admin.html', username=session.get('username'))
     return redirect(url_for('login_page'))
@@ -79,6 +79,8 @@ def login():
 
             if role_id ==2:
                 return jsonify({'success': True, 'redirect': '/moder'})
+            elif role_id == 1:
+                return jsonify({'success': True, 'redirect': '/admin'})
             else:
                 return jsonify({'success': False, 'message': 'Нет доступа.'})
         else:
@@ -99,20 +101,29 @@ def register():
 
     if not username or not password:
         return jsonify({'success': False, 'message': 'Имя пользователя и пароль обязательны.'})
-    if (len(username) > 32 or len(username) < 4):
-        return jsonify({'success': False, 'message': 'Длина вашего имени пользователя не должна быть не менее 4 и не более 32'})
-    if (username == " "):
-        return jsonify({'success': False, 'message': 'Имя пользователя не должно быть пустым'})
-    if (passwordConf != password):
-        return jsonify({'success': False, 'message': 'Пароли не совпадают'})
+    if len(username) > 32 or len(username) < 4:
+        return jsonify({'success': False, 'message': 'Длина вашего имени пользователя не должна быть меньше 4 и больше 32 символов.'})
+    if username.strip() == "":
+        return jsonify({'success': False, 'message': 'Имя пользователя не должно быть пустым.'})
+    if passwordConf != password:
+        return jsonify({'success': False, 'message': 'Пароли не совпадают.'})
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
+        adminName = "superadmin22"
+        cur.execute("SELECT id FROM users WHERE username = %s", (adminName,))
+        if not cur.fetchone():
+            adminHashPass = generate_password_hash("root")
+            cur.execute(
+                "INSERT INTO users (username, password_hash, role_id) VALUES (%s, %s, %s)",
+                (adminName, adminHashPass, 1)
+            )
+
         cur.execute("SELECT id FROM users WHERE username = %s", (username,))
         if cur.fetchone():
             return jsonify({'success': False, 'message': 'Пользователь уже существует.'})
-
 
         hashed_password = generate_password_hash(password)
         role_id = 2
@@ -122,16 +133,19 @@ def register():
             (username, hashed_password, role_id)
         )
         conn.commit()
+
         session['username'] = username
         session['role_id'] = role_id
 
-        return jsonify({'success': True, 'redirect': '/moder', 'message': f'Успешно'})
-        
+        if role_id == 2:
+            return jsonify({'success': True, 'redirect': '/moder', 'message': 'Успешно зарегистрированы.'})
+
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера'})
+        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'})
     finally:
         if conn:
             conn.close()
+
 
 
 @app.route('/logout')
