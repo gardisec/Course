@@ -252,7 +252,6 @@ def add_product():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Получаем store_id на основании city и store
         cur.execute(
             """
             SELECT id FROM store_locations
@@ -267,7 +266,6 @@ def add_product():
 
         store_id = store_row[0]
 
-        # Вставляем новый продукт в таблицу products
         cur.execute(
             """
             INSERT INTO products (name, quantity, purchase_price, store_id)
@@ -308,7 +306,6 @@ def search_product():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Выполняем поиск продукта и связываем с таблицей store_locations для получения города и склада
         cur.execute(
             """
             SELECT sl.city, sl.store, p.name, p.quantity, p.purchase_price
@@ -402,53 +399,6 @@ def update_price(product_id):
             conn.close()
 
 
-@app.route('/change_store/<int:product_id>', methods=['POST'])
-def change_store(product_id):
-    data = request.json
-    city = data.get('city', '').strip()
-    store = data.get('store')
-
-    if not city or not store:
-        return jsonify({'success': False, 'message': 'Данные не заполнены.'}), 400
-
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-
-        # Получаем store_id на основании city и store
-        cur.execute(
-            """
-            SELECT id FROM store_locations
-            WHERE city = %s AND store = %s
-            """,
-            (city, store)
-        )
-        store_row = cur.fetchone()
-
-        if not store_row:
-            return jsonify({'success': False, 'message': 'Указанный город и склад не существуют.'}), 404
-
-        store_id = store_row[0]
-
-        # Обновляем store_id для указанного product_id
-        cur.execute(
-            """
-            UPDATE products
-            SET store_id = %s, updated_at = CURRENT_TIMESTAMP
-            WHERE id = %s
-            """,
-            (store_id, product_id)
-        )
-        conn.commit()
-
-        return jsonify({'success': True, 'message': 'Склад успешно обновлен.'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Ошибка сервера: {str(e)}'}), 500
-    finally:
-        if conn:
-            conn.close()
-
-
 @app.route('/update_product_store', methods=['POST'])
 def update_product_store():
     data = request.json
@@ -476,12 +426,13 @@ def update_product_store():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Проверяем, существует ли товар
-        cur.execute("SELECT 1 FROM products WHERE id = %s", (product_id,))
-        if cur.fetchone() is None:
+        cur.execute("SELECT store_id FROM products WHERE id = %s", (product_id,))
+        product_row = cur.fetchone()
+        if not product_row:
             return jsonify({"error": "Товар с указанным идентификатором не найден."}), 404
 
-        # Проверяем город и склад
+        current_store_id = product_row[0]
+
         cur.execute(
             "SELECT id FROM store_locations WHERE city = %s AND store = %s",
             (city, store)
@@ -490,12 +441,14 @@ def update_product_store():
         if not store_row:
             return jsonify({"error": "Указанный город и склад не существуют."}), 404
 
-        store_id = store_row[0]
+        new_store_id = store_row[0]
 
-        # Обновляем товар
+        if current_store_id == new_store_id:
+            return jsonify({"error": "Склад не изменен, текущий склад совпадает с указанным."}), 400
+
         cur.execute(
             "UPDATE products SET store_id = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s",
-            (store_id, product_id)
+            (new_store_id, product_id)
         )
         if cur.rowcount == 0:
             return jsonify({"error": "Ошибка при обновлении склада."}), 400
@@ -507,6 +460,7 @@ def update_product_store():
     finally:
         if conn:
             conn.close()
+
 
 
 
@@ -714,7 +668,6 @@ def delete_store():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Найти ID склада, соответствующего city и store
         cur.execute(
             "SELECT id FROM store_locations WHERE city = %s AND store = %s",
             (city, store)
@@ -726,7 +679,6 @@ def delete_store():
 
         store_id = store_id_row[0]
 
-        # Проверить, есть ли товары, связанные с этим складом
         cur.execute(
             "SELECT COUNT(*) FROM products WHERE store_id = %s",
             (store_id,)
@@ -736,7 +688,6 @@ def delete_store():
         if product_count > 0:
             return jsonify({'success': False, 'message': 'Невозможно удалить склад (он не пуст).'}), 400
         
-        # Удалить склад
         cur.execute(
             "DELETE FROM store_locations WHERE id = %s", (store_id,)
         )
