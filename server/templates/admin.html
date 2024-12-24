@@ -201,95 +201,85 @@
     </div>
     
     <script>
-async function openEditStoreModal(productId) {
-    // Сохранить ID продукта в скрытом поле
-    document.getElementById('modalProductId').value = productId;
+        async function openEditStoreModal(productId) {
 
-    // Очистить текущие значения в select
-    const citySelect = document.getElementById('modalCity');
-    citySelect.innerHTML = '<option value="" disabled selected>Выберите город</option>';
+            document.getElementById('modalProductId').value = productId;
 
-    const storeSelect = document.getElementById('modalStore');
-    storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-    storeSelect.disabled = true; // Отключаем выбор склада до выбора города
+            const citySelect = document.getElementById('modalCity');
+            citySelect.innerHTML = '<option value="" disabled selected>Выберите город</option>';
 
-    // Запросить данные городов и складов с сервера
-    const response = await fetch('/store_locations');
-    const storeLocations = await response.json();
+            const storeSelect = document.getElementById('modalStore');
+            storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
+            storeSelect.disabled = true; 
 
-    // Заполнить select городов
-    for (const city in storeLocations) {
-        const option = document.createElement('option');
-        option.value = city;
-        option.textContent = city;
-        citySelect.appendChild(option);
-    }
+            const response = await fetch('/store_locations');
+            const storeLocations = await response.json();
 
-    // Обработчик изменения города
-    citySelect.addEventListener('change', () => {
-        const selectedCity = citySelect.value;
-
-        // Очистить и заполнить select складов для выбранного города
-        storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-        if (storeLocations[selectedCity]) {
-            storeLocations[selectedCity].forEach(store => {
+            for (const city in storeLocations) {
                 const option = document.createElement('option');
-                option.value = store;
-                option.textContent = store;
-                storeSelect.appendChild(option);
+                option.value = city;
+                option.textContent = city;
+                citySelect.appendChild(option);
+            }
+
+            citySelect.addEventListener('change', () => {
+                const selectedCity = citySelect.value;
+
+                storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
+                if (storeLocations[selectedCity]) {
+                    storeLocations[selectedCity].forEach(store => {
+                        const option = document.createElement('option');
+                        option.value = store;
+                        option.textContent = store;
+                        storeSelect.appendChild(option);
+                    });
+                }
+                storeSelect.disabled = false; 
             });
+
+            document.getElementById('editStoreModal').classList.remove('hidden');
         }
-        storeSelect.disabled = false; // Включаем выбор склада
-    });
 
-    // Показать модальное окно
-    document.getElementById('editStoreModal').classList.remove('hidden');
-}
+        function closeModal() {
+            document.getElementById('editStoreModal').classList.add('hidden');
+        }
 
-function closeModal() {
-    document.getElementById('editStoreModal').classList.add('hidden');
-}
+        document.getElementById('editStoreForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); 
 
-document.getElementById('editStoreForm').addEventListener('submit', async function(event) {
-    event.preventDefault(); // Предотвращаем отправку формы
+            const productId = document.getElementById('modalProductId').value;
+            const city = document.getElementById('modalCity').value;
+            const store = document.getElementById('modalStore').value;
 
-    const productId = document.getElementById('modalProductId').value;
-    const city = document.getElementById('modalCity').value;
-    const store = document.getElementById('modalStore').value;
+            if (!city || !store) {
+                alert('Выберите город и склад.');
+                return;
+            }
 
-    if (!city || !store) {
-        alert('Выберите город и склад.');
-        return;
-    }
+            const response = await fetch(`/update_product_store`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId, city, store }),
+            });
 
-    // Отправка данных на сервер для обновления
-    const response = await fetch(`/update_product_store`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId, city, store }),
-    });
+            if (response.ok) {
+                alert('Склад обновлен успешно!');
+                closeModal();
 
-    if (response.ok) {
-        alert('Склад обновлен успешно!');
-        closeModal();
-
-        // Обновить данные на клиенте (например, перезагрузить таблицу)
-        loadProducts();
-    } else {
-        alert('Ошибка при обновлении склада.');
-    }
-});
+                loadProducts();
+            } else {
+                alert('Ошибка при обновлении склада.');
+            }
+        });
         async function fetchStoreLocations() {
             try {
                 const response = await fetch('/store_locations');
                 if (response.ok) {
                     const storeLocations = await response.json();
 
-                    // Обновляем выпадающие списки городов
                     populateCitySelect('productCity', storeLocations);
                     populateCitySelect('filterCity', storeLocations);
 
-                    // Добавляем обработчики для обновления списка складов
                     document.getElementById('productCity').addEventListener('change', () => {
                         updateStoreSelect('productCity', 'productStore', storeLocations, 'Выберите склад');
                     });
@@ -331,7 +321,6 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
             }
         }
 
-        // Загружаем данные о городах и складах при загрузке страницы
         document.addEventListener('DOMContentLoaded', fetchStoreLocations);
 
 
@@ -432,11 +421,16 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
         document.getElementById('addRoleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById('roleName').value; 
-            const id = document.getElementById('role_id').value;
+            const name = document.getElementById('roleName').value.trim();
+            const id = document.getElementById('role_id').value.trim();
 
             if (!name || !id) {
                 alert('Пожалуйста, заполните все поля!');
+                return;
+            }
+
+            if (name.length < 1 || name.length > 32) {
+                alert('Название роли должно содержать от 1 до 32 символов.');
                 return;
             }
 
@@ -446,26 +440,29 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id, name }), 
+                    body: JSON.stringify({ id, name }),
                 });
 
+                const result = await response.json();
+
                 if (response.ok) {
-                    alert('Роль успешно добавлена!');
+                    alert(result.message || 'Роль успешно добавлена!');
                     document.getElementById('addRoleForm').reset(); 
-                    loadRoles();
+                    loadRoles(); 
                 } else {
-                    alert('Ошибка при добавлении роли.');
+                    alert(result.message || 'Ошибка при добавлении роли.');
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
                 alert('Произошла ошибка. Попробуйте позже.');
             }
         });
+
         
         document.getElementById('deleteRoleForm').addEventListener('submit', async (e) => {
-            e.preventDefault(); 
+            e.preventDefault();
 
-            const roleId = document.getElementById('deleteRoleId').value;
+            const roleId = document.getElementById('deleteRoleId').value.trim();
 
             if (!roleId) {
                 alert('Пожалуйста, введите ID роли!');
@@ -481,12 +478,14 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                     body: JSON.stringify({ id: roleId }),
                 });
 
+                const result = await response.json();
+
                 if (response.ok) {
-                    alert('Роль успешно удалена!');
+                    alert(result.message || 'Роль успешно удалена!');
                     document.getElementById('deleteRoleForm').reset(); 
                     loadRoles();
                 } else {
-                    alert('Ошибка при удалении роли.');
+                    alert(result.message || 'Ошибка при удалении роли.');
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -557,8 +556,8 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
         document.getElementById('updateUserRoleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const username = document.getElementById('username').value;
-            const role = document.getElementById('userRole').value;
+            const username = document.getElementById('username').value.trim();
+            const role = document.getElementById('userRole').value.trim();
 
             if (!username || !role) {
                 alert('Пожалуйста, заполните все поля!');
@@ -572,20 +571,21 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                     body: JSON.stringify({ username, role })
                 });
 
-                if (!response.ok) {
-                    const error = await response.json();
-                    alert(error.error || 'Ошибка при изменении роли.');
-                    return;
-                }
+                const result = await response.json();
 
-                alert('Роль пользователя успешно изменена!');
-                document.getElementById('updateUserRoleForm').reset();
-                loadUsers();
+                if (response.ok && result.success) {
+                    alert(result.message || 'Роль пользователя успешно изменена!');
+                    document.getElementById('updateUserRoleForm').reset(); 
+                    loadUsers(); 
+                } else {
+                    alert(result.message || 'Ошибка при изменении роли.');
+                }
             } catch (error) {
                 console.error('Ошибка:', error);
                 alert('Произошла ошибка. Попробуйте позже.');
             }
         });
+
         
         document.getElementById('applyFilters').addEventListener('click', () => {
             loadProducts();
@@ -615,10 +615,10 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                 body: JSON.stringify({ name, quantity, price, city, store })
             });
 
-            const result = await response.json(); // Парсим ответ
+            const result = await response.json(); 
             if (result.success) {
                 alert(result.message);
-                loadProducts(); // Перезагрузка списка товаров
+                loadProducts(); 
             } else {
                 alert(result.message);
             }
@@ -687,20 +687,27 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
                 return;
             }
 
+            if (store && isNaN(store)) {
+                alert('Номер склада должен быть числом');
+                return;
+            }
+
             try {
                 const response = await fetch('/add_store', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ city, store })
+                    body: JSON.stringify({ city, store: parseInt(store, 10) })
                 });
 
-                if (response.status === 201) {
-                    alert('Склад успешно добавлен');
-                    loadStoreTable(); 
-                    fetchStoreLocations();
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message || 'Склад успешно добавлен');
+                    loadStoreTable();
+                    fetchStoreLocations(); 
                     document.getElementById('addStore').reset(); 
                 } else {
-                    alert('Ошибка при добавлении склада');
+                    alert(result.message || 'Ошибка при добавлении склада');
                 }
             } catch (error) {
                 console.error('Ошибка:', error);
@@ -709,39 +716,47 @@ document.getElementById('editStoreForm').addEventListener('submit', async functi
         });
 
    
-    document.getElementById('delStore').addEventListener('submit', async (event) => {
-        event.preventDefault(); 
+        document.getElementById('delStore').addEventListener('submit', async (event) => {
+            event.preventDefault();
 
-        const city = document.getElementById('delCity').value.trim();
-        const store = document.getElementById('delStoreNumber').value.trim();
+            const city = document.getElementById('delCity').value.trim();
+            const store = document.getElementById('delStoreNumber').value.trim();
 
-        if (!city || !store) {
-            alert('Все поля обязательны для заполнения');
-            return;
-        }
-
-        try {
-            const response = await fetch('/delete_store', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ city, store })
-            });
-
-            if (response.status === 204) {
-                alert('Склад успешно удалён');
-                loadStoreTable(); 
-                fetchStoreLocations();
-                loadProducts();
-                document.getElementById('delStore').reset(); 
-            } else {
-                const errorData = await response.json();
-                alert(errorData.error || 'Ошибка при удалении склада');
+            if (!city || !store) {
+                alert('Пожалуйста, заполните все поля!');
+                return;
             }
-        } catch (error) {
-            console.error('Ошибка:', error);
-            alert('Не удалось связаться с сервером');
-        }
-    });
+
+            try {
+                const response = await fetch('/delete_store', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ city, store }),
+                });
+
+                if (response.ok) {
+                    const responseData = await response.json();
+                    if (responseData.success) {
+                        alert(responseData.message || 'Склад успешно удалён.');
+                        loadStoreTable(); 
+                        fetchStoreLocations(); 
+                        loadProducts(); 
+                        document.getElementById('delStore').reset(); 
+                    } else {
+                        alert(responseData.message || 'Ошибка при удалении склада.');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    alert(errorData.message || 'Ошибка при удалении склада.');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Не удалось связаться с сервером. Попробуйте позже.');
+            }
+        });
+
 
     async function loadStoreTable() {
         try {
