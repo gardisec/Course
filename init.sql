@@ -73,3 +73,12 @@ INSERT INTO public.roles (name) VALUES ('admin')
 ON CONFLICT (name) DO NOTHING;
 INSERT INTO public.roles (name) VALUES ('moder')
 ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO public.store_locations (city, store) VALUES 
+    ('Новосибирск', 1),
+    ('Новосибирск', 2),
+    ('Новосибирск', 3),
+    ('Барнаул', 1),
+    ('Барнаул', 2),
+    ('Бийск', 1)
+ON CONFLICT (city, store) DO NOTHING;
