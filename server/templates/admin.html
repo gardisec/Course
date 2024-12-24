@@ -195,9 +195,6 @@
         
         // Удаляем у всех класс active
         containers.forEach(container => container.classList.remove('active'));
-        
-        // Добавляем ко всем класс active
-        containers.forEach(container => container.classList.add('active'));
     });
 
         async function openEditStoreModal(productId) {
@@ -625,6 +622,11 @@
                 return;
             }
 
+            if (store > 10000) {
+                alert('Номер склада должен быть меньше 10000');
+                return;
+            }
+
             try {
                 const response = await fetch('/add_store', {
                     method: 'POST',
@@ -657,6 +659,10 @@
 
             if (!city || !store) {
                 alert('Пожалуйста, заполните все поля!');
+                return;
+            }
+            if (store > 10000) {
+                alert('Номер склада не может быть больше чем 10000');
                 return;
             }
 

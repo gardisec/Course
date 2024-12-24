@@ -263,7 +263,7 @@ def add_product():
 
     city = data.get('city', '').strip()
 
-    if not name:
+    if not name or len(name) > 40:
         return jsonify({'success': False, 'message': 'Название товара некорректно.'})
     if quantity < 0:
         return jsonify({'success': False, 'message': 'Количество товара некорректное.'})
