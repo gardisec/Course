@@ -46,7 +46,7 @@ def admin_page():
 @app.route('/moder')
 def moder_page():
     if 'username' in session and session.get('role_id') == 2:
-        return render_template('admin.html', username=session.get('username'))
+        return render_template('moder.html', username=session.get('username'))
     return redirect(url_for('login_page'))
 
 @app.route('/user')
