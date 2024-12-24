@@ -4,9 +4,7 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-image: url('backgroundLogin.jpg');
-    background-size: cover; /* Масштабировать фон, чтобы покрывал весь экран */
-    background-position: center; /* Центрировать изображение */
+    background-color: #dde9f6;
     box-sizing: border-box;
 }
 
@@ -22,15 +20,6 @@ body {
     height: 100vh;
     position: fixed;
     box-shadow: 8px 0 10px rgba(0, 0, 0, 0.1); /* Тонкая чёрная тень */
-}
-
-.tree-image {
-    position: absolute;
-    bottom: 20px; /* Расстояние от нижнего края */
-    left: 50%; /* Центрирование по горизонтали */
-    transform: translateX(-50%); /* Убирает смещение из-за left: 50% */
-    max-width: 100px; /* Установка максимальной ширины */
-    height: auto; /* Сохранение пропорций изображения */
 }
 
 .sidebar button, .logout-button {
