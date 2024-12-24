@@ -255,21 +255,27 @@
                 return;
             }
 
-            const response = await fetch(`/update_product_store`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, city, store }),
-            });
+            try {
+                const response = await fetch(`/update_product_store`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId, city, store }),
+                });
 
-            if (response.ok) {
-                alert('Склад обновлен успешно!');
-                closeModal();
+                const result = await response.json();
 
-                loadProducts();
-            } else {
-                alert('Ошибка при обновлении склада.');
+                if (response.ok) {
+                    alert(result.message || 'Склад обновлен успешно!');
+                    closeModal();
+                    loadProducts();
+                } else {
+                    alert(result.error || 'Ошибка при обновлении склада.');
+                }
+            } catch (error) {
+                alert(`Произошла ошибка: ${error.message}`);
             }
         });
+
         async function fetchStoreLocations() {
             try {
                 const response = await fetch('/store_locations');
