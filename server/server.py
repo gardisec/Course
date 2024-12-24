@@ -423,8 +423,11 @@ def add_role():
         conn.close()
 
 
-@app.route('/delete_role/<int:role_id>', methods=['DELETE'])
-def delete_role(role_id):
+@app.route('/delete_role', methods=['DELETE'])
+def delete_role():
+    data = request.json
+    role_id  = data.get('id')
+
     try:
         conn = get_db_connection()
         cur = conn.cursor()
@@ -560,8 +563,8 @@ def add_store():
     except (ValueError, TypeError):
         return jsonify({'success': False, 'message': 'Номер склада должен быть целым числом.'})
     
-    if (len(city) < 1 or len(store) > 50):
-        return jsonify({'success': False, 'message': 'Название роли должно содержать от 1 до 50 символов.'}), 400
+    if (len(city) < 1 or len(city) > 50):
+        return jsonify({'success': False, 'message': 'Название города должно содержать от 1 до 50 символов.'}), 400
     
     try:
        
