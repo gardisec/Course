@@ -198,10 +198,8 @@
             button.addEventListener('click', () => {
                 const targetId = button.getAttribute('data-target');
 
-                // Скрываем все контейнеры
                 containers.forEach(container => container.classList.remove('active'));
 
-                // Показываем только целевой контейнер
                 const targetContainer = document.getElementById(targetId);
                 if (targetContainer) {
                     targetContainer.classList.add('active');
@@ -209,7 +207,7 @@
             });
         });
 
-        // Кнопка "Главная" для отображения всех контейнеров
+
         document.getElementById('showAllContent').addEventListener('click', () => {
             containers.forEach(container => container.classList.add('active'));
         });
@@ -554,6 +552,16 @@
             const city = document.getElementById('productCity').value;
             const store = parseInt(document.getElementById('productStore').value, 10);
 
+            if (quantity > 1000000){
+                alert('Количество товара не может превышать 1.000.000');
+                return;
+            }
+
+            if (price > 100000000){
+                alert('Количество товара не может превышать 1.000.000.00');
+                return;
+            }
+            
             const response = await fetch('/add_product', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -659,7 +667,7 @@
                 alert('Номер склада должен быть числом');
                 return;
             }
-            
+
             try {
                 const response = await fetch('/delete_store', {
                     method: 'POST',

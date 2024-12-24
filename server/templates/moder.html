@@ -11,7 +11,7 @@
     
     <div class="sidebar">
         <h7>Добро пожаловать, {{username}}</h7>
-        
+        <button id="showAllContent">Главная</button>
         <button data-target="product-management">Управление товарами</button>
         <button data-target="export">Экспорт</button>
         <button class="logout-button" onclick="window.location.href='/logout';">Выход</button>
@@ -112,32 +112,26 @@
     
     <script>
 
-        const buttons = document.querySelectorAll('.sidebar button');
+        
+        const buttons = document.querySelectorAll('.sidebar button[data-target]');
         const containers = document.querySelectorAll('.container');
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
-                const target = button.getAttribute('data-target');
+                const targetId = button.getAttribute('data-target');
 
-                containers.forEach(container => {
-                    if (container.id === target) {
-                        container.classList.add('active');
-                    } else {
-                        container.classList.remove('active');
-                    }
-                });
+                containers.forEach(container => container.classList.remove('active'));
+
+                const targetContainer = document.getElementById(targetId);
+                if (targetContainer) {
+                    targetContainer.classList.add('active');
+                }
             });
         });
 
-
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.container').forEach(container => {
-                    container.classList.remove('active');
-                });
-                const target = button.getAttribute('data-target');
-                document.getElementById(target).classList.add('active');
-            });
+        
+        document.getElementById('showAllContent').addEventListener('click', () => {
+            containers.forEach(container => container.classList.add('active'));
         });
 
         async function openEditStoreModal(productId) {
@@ -244,7 +238,15 @@
             const price = parseFloat(document.getElementById('productPrice').value);
             const city = document.getElementById('productCity').value;
             const store = parseInt(document.getElementById('productStore').value, 10);
+            if (quantity > 1000000){
+                alert('Количество товара не может превышать 1.000.000');
+                return;
+            }
 
+            if (price > 100000000){
+                alert('Количество товара не может превышать 1.000.000.00');
+                return;
+            }
             const response = await fetch('/add_product', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
