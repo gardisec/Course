@@ -24,6 +24,15 @@ body {
     box-shadow: 8px 0 10px rgba(0, 0, 0, 0.1); /* Тонкая чёрная тень */
 }
 
+.tree-image {
+    position: absolute;
+    bottom: 20px; /* Расстояние от нижнего края */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translateX(-50%); /* Убирает смещение из-за left: 50% */
+    max-width: 100px; /* Установка максимальной ширины */
+    height: auto; /* Сохранение пропорций изображения */
+}
+
 .sidebar button, .logout-button {
     width: 100%;
     margin: 10px 0;
