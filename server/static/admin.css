@@ -57,7 +57,7 @@ body {
     margin: 20px auto;
     padding: 20px;
     max-width: 800px;
-    border: 1px solid #ffd700; /* Золотая рамка */
+    border: 1px solid #31312e; /* Золотая рамка */
     border-radius: 8px;
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -76,7 +76,7 @@ h2, h3, h4 {
 
 h7 {
     margin-top: 0;
-    color: #2e2ece;
+    color: #ffffff;
 }
 /* Кнопка выхода */
 
@@ -106,7 +106,7 @@ th, td {
 }
 
 th {
-    background-color: #ffd700; /* Золотой цвет */
+    background-color: #000000; /* Золотой цвет */
     font-weight: bold;
     color: #000000;
 }
@@ -114,7 +114,7 @@ th {
 td {
     background-color: rgba(255, 255, 255, 0.8);
     color: #000000;
-    border: 1px solid #ffd700;
+    border: 1px solid #000000;
 }
 
 /* Поля ввода и кнопки */
@@ -127,15 +127,15 @@ button {
     padding: 10px;
     width: 100%;
     max-width: 100%;
-    border: 1px solid #036983;
+    border: 1px solid #ffa00f;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
 button {
-    background-color: #036983;
+    background-color: #ffa00f;
     color: #fff;
-    border: 2px solid #11c278;
+    border: 2px solid #0d3572;
     cursor: pointer;
     transition: transform 0.3s, background-color 0.3s;
 }
