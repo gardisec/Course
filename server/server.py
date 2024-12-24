@@ -139,7 +139,6 @@ def logout():
 @app.route('/products', methods=['GET'])
 def get_products():
     try:
-      
         name = request.args.get('name', '').strip()
         city = request.args.get('city', '').strip()
         store = request.args.get('store', '').strip()
@@ -148,29 +147,42 @@ def get_products():
         price_min = request.args.get('priceMin')
         price_max = request.args.get('priceMax')
 
-        query = "SELECT id, city, store, name, quantity, purchase_price FROM products WHERE 1=1"
+        query = """
+            SELECT 
+                p.id, 
+                sl.city, 
+                sl.store, 
+                p.name, 
+                p.quantity, 
+                p.purchase_price 
+            FROM 
+                products p
+            INNER JOIN 
+                store_locations sl ON p.store_id = sl.id
+            WHERE 1=1
+        """
         params = []
 
         if name:
-            query += " AND name ILIKE %s"
+            query += " AND p.name ILIKE %s"
             params.append(f"%{name}%")
         if city:
-            query += " AND city = %s"
+            query += " AND sl.city = %s"
             params.append(city)
         if store:
-            query += " AND store = %s"
-            params.append(store)
+            query += " AND sl.store = %s"
+            params.append(int(store))
         if quantity_min:
-            query += " AND quantity >= %s"
+            query += " AND p.quantity >= %s"
             params.append(int(quantity_min))
         if quantity_max:
-            query += " AND quantity <= %s"
+            query += " AND p.quantity <= %s"
             params.append(int(quantity_max))
         if price_min:
-            query += " AND purchase_price >= %s"
+            query += " AND p.purchase_price >= %s"
             params.append(float(price_min))
         if price_max:
-            query += " AND purchase_price <= %s"
+            query += " AND p.purchase_price <= %s"
             params.append(float(price_max))
 
         conn = get_db_connection()
@@ -185,10 +197,12 @@ def get_products():
                 'store': p[2],
                 'name': p[3],
                 'quantity': p[4],
-                'price': p[5]
+                'price': float(p[5])
             }
             for p in products
         ])
+    except Exception as e:
+        return jsonify({"error": "Внутренняя ошибка сервера."}), 500
     finally:
         conn.close()
 
@@ -523,7 +537,7 @@ def delete_role():
 
     if not role_id:
         return jsonify({'success': False, 'message': 'ID обязателен.'}), 400
-    if (role_id == 1):
+    if (role_id == '1'):
         return jsonify({'success': False, 'message': 'Вы не можете удалить роль admin.'}), 400
     try:
         conn = get_db_connection()
@@ -669,7 +683,7 @@ def add_store():
     except (ValueError, TypeError):
         return jsonify({'success': False, 'message': 'Номер склада должен быть целым числом.'})
     
-    if (len(city) < 1 or len(store) > 50):
+    if (len(city) < 1 or len(city) > 50):
         return jsonify({'success': False, 'message': 'Название роли должно содержать от 1 до 50 символов.'}), 400
     
     try:
