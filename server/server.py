@@ -457,10 +457,16 @@ def update_product_store():
 
     try:
         store = int(data.get('store', -1))
+        if store <= 0:
+            raise ValueError
     except (ValueError, TypeError):
         return jsonify({"error": "Неверный номер склада."}), 400
 
-    if not isinstance(product_id, int) or product_id <= 0:
+    try:
+        product_id = int(product_id)
+        if product_id <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
         return jsonify({"error": "Неверный идентификатор товара."}), 400
 
     if not city:
@@ -470,43 +476,38 @@ def update_product_store():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        # Проверяем, существует ли продукт с указанным ID
+        # Проверяем, существует ли товар
         cur.execute("SELECT 1 FROM products WHERE id = %s", (product_id,))
         if cur.fetchone() is None:
             return jsonify({"error": "Товар с указанным идентификатором не найден."}), 404
 
-        # Получаем store_id на основании города и номера склада
+        # Проверяем город и склад
         cur.execute(
-            """
-            SELECT id FROM store_locations
-            WHERE city = %s AND store = %s
-            """,
+            "SELECT id FROM store_locations WHERE city = %s AND store = %s",
             (city, store)
         )
         store_row = cur.fetchone()
-
         if not store_row:
             return jsonify({"error": "Указанный город и склад не существуют."}), 404
 
         store_id = store_row[0]
 
-        # Обновляем store_id для указанного product_id
+        # Обновляем товар
         cur.execute(
-            """
-            UPDATE products
-            SET store_id = %s, updated_at = CURRENT_TIMESTAMP
-            WHERE id = %s
-            """,
+            "UPDATE products SET store_id = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s",
             (store_id, product_id)
         )
-        conn.commit()
+        if cur.rowcount == 0:
+            return jsonify({"error": "Ошибка при обновлении склада."}), 400
 
+        conn.commit()
         return jsonify({"message": "Склад обновлен успешно."}), 200
     except Exception as e:
         return jsonify({"error": f"Внутренняя ошибка сервера: {str(e)}"}), 500
     finally:
         if conn:
             conn.close()
+
 
 
 @app.route('/add_role', methods=['POST'])
@@ -520,7 +521,7 @@ def add_role():
         cur = conn.cursor()
         cur.execute(
             "INSERT INTO roles (name) VALUES (%s)",
-            (name)
+            (name,)
         )
         conn.commit()
         return jsonify({'success': True, 'message': 'Роль успешно добавлена.'}), 201
@@ -713,26 +714,41 @@ def delete_store():
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # Найти ID склада, соответствующего city и store
         cur.execute(
-            "SELECT COUNT(*) FROM products WHERE city = %s AND store = %s",
+            "SELECT id FROM store_locations WHERE city = %s AND store = %s",
             (city, store)
+        )
+        store_id_row = cur.fetchone()
+
+        if not store_id_row:
+            return jsonify({'success': False, 'message': 'Склад не найден.'}), 404
+
+        store_id = store_id_row[0]
+
+        # Проверить, есть ли товары, связанные с этим складом
+        cur.execute(
+            "SELECT COUNT(*) FROM products WHERE store_id = %s",
+            (store_id,)
         )
         product_count = cur.fetchone()[0]
 
         if product_count > 0:
-            return jsonify({'success': False, 'message': 'Невозможно удалить склад(он не пуст).'}), 400
+            return jsonify({'success': False, 'message': 'Невозможно удалить склад (он не пуст).'}), 400
         
+        # Удалить склад
         cur.execute(
-            "DELETE FROM store_locations WHERE city = %s AND store = %s", (city, store)
+            "DELETE FROM store_locations WHERE id = %s", (store_id,)
         )
 
         conn.commit()
         return jsonify({'success': True, 'message': 'Склад успешно удалён.'}), 204 
     except Exception as e:
         conn.rollback()
-        return jsonify({'success': False, 'message': 'Ошибка при удалении склада.'}), 500
+        return jsonify({'success': False, 'message': f'Ошибка при удалении склада: {e}'}), 500
     finally:
         conn.close()
+
 
 
 @app.route('/get_stores', methods=['GET'])
