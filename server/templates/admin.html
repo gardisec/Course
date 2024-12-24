@@ -22,19 +22,7 @@
     <div class="main-content">
         <div class="container active" id="user-management">
             <h2>Управление пользователями и ролями</h2>
-        
-                <form id="addRoleForm">
-                    <h4>Добавить роль</h4>
-                    <input type="text" id="roleName" placeholder="Название роли" required>
-                    <button type="submit">Добавить роль</button>
-                </form>
-                
-                <form id="deleteRoleForm">
-                    <h4>Удалить роль</h4>
-                    <input type="text" id="deleteRoleId" placeholder="ID роли" required>
-                    <button type="submit">Удалить роль</button>
-                </form>
-        
+
                 <h4>Список ролей</h4>
                 <table id="roleTable">
                     <thead>
@@ -47,6 +35,7 @@
                    
                     </tbody>
                 </table>
+
                 <form id="updateUserRoleForm">
                     <h4>Изменить роль пользователя</h4>
                     <input type="text" id="username" placeholder="Имя пользователя" required>
@@ -423,79 +412,6 @@
             }
         }
 
-        document.getElementById('addRoleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const name = document.getElementById('roleName').value.trim();
-
-            if (!name) {
-                alert('Пожалуйста, заполните поле с название роли!');
-                return;
-            }
-
-            if (name.length < 1 || name.length > 32) {
-                alert('Название роли должно содержать от 1 до 32 символов.');
-                return;
-            }
-
-            try {
-                const response = await fetch('/add_role', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name }),
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(result.message || 'Роль успешно добавлена!');
-                    document.getElementById('addRoleForm').reset(); 
-                    loadRoles(); 
-                } else {
-                    alert(result.message || 'Ошибка при добавлении роли.');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка. Попробуйте позже.');
-            }
-        });
-
-        
-        document.getElementById('deleteRoleForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const roleId = document.getElementById('deleteRoleId').value.trim();
-
-            if (!roleId) {
-                alert('Пожалуйста, введите ID роли!');
-                return;
-            }
-
-            try {
-                const response = await fetch('/delete_role', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ id: roleId }),
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(result.message || 'Роль успешно удалена!');
-                    document.getElementById('deleteRoleForm').reset(); 
-                    loadRoles();
-                } else {
-                    alert(result.message || 'Ошибка при удалении роли.');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка. Попробуйте позже.');
-            }
-        });
 
         async function loadRoles() {
             try {

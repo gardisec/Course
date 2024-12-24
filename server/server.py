@@ -81,6 +81,8 @@ def login():
                 return jsonify({'success': True, 'redirect': '/moder'})
             elif role_id == 1:
                 return jsonify({'success': True, 'redirect': '/admin'})
+            elif role_id == 3:
+                return jsonify({'success': False, 'message': 'Вы забанены.'})
             else:
                 return jsonify({'success': False, 'message': 'Нет доступа.'})
         else:
@@ -478,53 +480,6 @@ def update_product_store():
     finally:
         if conn:
             conn.close()
-
-
-
-
-@app.route('/add_role', methods=['POST'])
-def add_role():
-    data = request.json
-    name = data.get('name')
-    if (len(name) < 1 or len(name) > 32):
-        return jsonify({'success': False, 'message': 'Название роли должно содержать от 1 до 32 символов.'}), 400
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "INSERT INTO roles (name) VALUES (%s)",
-            (name,)
-        )
-        conn.commit()
-        return jsonify({'success': True, 'message': 'Роль успешно добавлена.'}), 201
-    except Exception as a:
-        return jsonify({'success': False, 'message': 'Ошибка при добавлении роли.'}), 500
-    finally:
-        conn.close()
-
-
-@app.route('/delete_role', methods=['POST'])
-def delete_role():
-    data = request.json
-    role_id = data.get('id') 
-
-    if not role_id:
-        return jsonify({'success': False, 'message': 'ID обязателен.'}), 400
-    if (role_id == '1'):
-        return jsonify({'success': False, 'message': 'Вы не можете удалить роль admin.'}), 400
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute(
-            "DELETE FROM roles WHERE id = %s", (role_id)
-        )
-        conn.commit()
-        return jsonify({'success': True, 'message': 'Роль успешно удалена.'}), 201
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'message': 'Ошибка при удалении роли.'}), 500
-    finally:
-        conn.close()
 
 
 @app.route('/roles', methods=['GET'])

@@ -71,7 +71,11 @@ CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users (role_id);
 
 INSERT INTO public.roles (name) VALUES ('admin')
 ON CONFLICT (name) DO NOTHING;
+
 INSERT INTO public.roles (name) VALUES ('moder')
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO public.roles (name) VALUES ('Banned')
 ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO public.store_locations (city, store) VALUES 
