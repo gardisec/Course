@@ -4,7 +4,9 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color :#a5a6a7; 
+    background-image: url('backgroundLogin.jpg');
+    background-size: cover; /* Масштабировать фон, чтобы покрывал весь экран */
+    background-position: center; /* Центрировать изображение */
     box-sizing: border-box;
 }
 
