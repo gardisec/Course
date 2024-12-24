@@ -13,7 +13,7 @@ body {
 /* Стили для боковой панели */
 .sidebar {
     width: 200px;
-    background-color: #8b0000; /* Темно-красный цвет */
+    background-color: #036983; /* Темно-красный цвет */
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -38,9 +38,9 @@ body {
     width: 100%;
     margin: 10px 0;
     padding: 10px;
-    background-color: #ffd700; /* Золотистый цвет */
+    background-color: #008d18; /* Золотистый цвет */
     border: none;
-    color: #8b0000; /* Красный текст */
+    color: #036983; /* Красный текст */
     text-align: center;
     cursor: pointer;
     border-radius: 10px;
@@ -49,8 +49,8 @@ body {
 }
 
 .sidebar button:hover, .logout-button:hover {
-    background-color: #ff4500; /* Ярко-красный при наведении */
-    transform: scale(1.1); /* Увеличение кнопок */
+    background-color: #00ff2a; /* Ярко-красный при наведении */
+    transform: scale(1.04); /* Увеличение кнопок */
 }
 
 /* Основное содержимое */
@@ -82,13 +82,13 @@ body {
 /* Заголовки */
 h2, h3, h4 {
     margin-top: 0;
-    color: #8b0000; /* Темно-красный */
+    color: #000000; /* Темно-красный */
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 h7 {
     margin-top: 0;
-    color: #ffffff;
+    color: #000000;
 }
 /* Кнопка выхода */
 
@@ -120,12 +120,12 @@ th, td {
 th {
     background-color: #ffd700; /* Золотой цвет */
     font-weight: bold;
-    color: #8b0000;
+    color: #000000;
 }
 
 td {
     background-color: rgba(255, 255, 255, 0.8);
-    color: #333;
+    color: #000000;
     border: 1px solid #ffd700;
 }
 
@@ -139,22 +139,22 @@ button {
     padding: 10px;
     width: 100%;
     max-width: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid #036983;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
 button {
-    background-color: #ff4500;
+    background-color: #036983;
     color: #fff;
-    border: 2px solid #ffd700;
+    border: 2px solid #11c278;
     cursor: pointer;
     transition: transform 0.3s, background-color 0.3s;
 }
 
 button:hover {
-    background-color: #ffd700;
-    transform: scale(1.1);
+    background-color: #00c6e0;
+    transform: scale(1.04);
 }
 
 /* Стили для фильтров */
