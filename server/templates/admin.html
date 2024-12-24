@@ -191,12 +191,27 @@
     <script>
 
 
-        document.getElementById('showAllContent').addEventListener('click', function () {
-            const containers = document.querySelectorAll('.main-content .container');
-            
-            containers.forEach(container => container.classList.remove('active'));
-            
-            containers.forEach(container => container.style.display = 'block');
+        const buttons = document.querySelectorAll('.sidebar button[data-target]');
+        const containers = document.querySelectorAll('.container');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetId = button.getAttribute('data-target');
+
+                // Скрываем все контейнеры
+                containers.forEach(container => container.classList.remove('active'));
+
+                // Показываем только целевой контейнер
+                const targetContainer = document.getElementById(targetId);
+                if (targetContainer) {
+                    targetContainer.classList.add('active');
+                }
+            });
+        });
+
+        // Кнопка "Главная" для отображения всех контейнеров
+        document.getElementById('showAllContent').addEventListener('click', () => {
+            containers.forEach(container => container.classList.add('active'));
         });
 
         async function openEditStoreModal(productId) {
@@ -557,34 +572,6 @@
         loadRoles();
         loadUsers();
         loadProducts();
-
-        const buttons = document.querySelectorAll('.sidebar button');
-        const containers = document.querySelectorAll('.container');
-
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const target = button.getAttribute('data-target');
-
-                containers.forEach(container => {
-                    if (container.id === target) {
-                        container.classList.add('active');
-                    } else {
-                        container.classList.remove('active');
-                    }
-                });
-            });
-        });
-
-
-        document.querySelectorAll('.sidebar button').forEach(button => {
-            button.addEventListener('click', () => {
-                document.querySelectorAll('.container').forEach(container => {
-                    container.classList.remove('active');
-                });
-                const target = button.getAttribute('data-target');
-                document.getElementById(target).classList.add('active');
-            });
-        });
         
         document.getElementById('downloadCsvButton').addEventListener('click', () => {
             fetch('/download-csv?format=excel') // Изменяем параметр format на excel
