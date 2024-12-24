@@ -56,13 +56,12 @@ CREATE TABLE IF NOT EXISTS public.users
 );
 
 CREATE TABLE audit (
-    id SERIAL PRIMARY KEY, 
-    username TEXT NOT NULL, 
-    role_id INT NOT NULL, 
-    product_id INT NOT NULL, 
-    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL,
+    role_id INT NOT NULL,
+    product_id INT NOT NULL,
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_audit_username FOREIGN KEY (username) REFERENCES users(username) ON DELETE CASCADE,
-    CONSTRAINT fk_audit_role_id FOREIGN KEY (role_id) REFERENCES users(role_id) ON DELETE CASCADE,
     CONSTRAINT fk_audit_product_id FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
