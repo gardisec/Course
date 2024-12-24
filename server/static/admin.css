@@ -12,7 +12,7 @@ body {
 /* Стили для боковой панели */
 .sidebar {
     width: 200px;
-    background-color: linear-gradient(to bottom, #ffecd2, #ffe8d6); /* Темно-красный цвет */
+    background-color: #e2d9ae; /* Темно-красный цвет */
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@ body {
 }
 
 .sidebar button:hover, .logout-button:hover {
-    background-color: #dae4a3; /* Ярко-красный при наведении */
+    background-color: #10c4ca; /* Ярко-красный при наведении */
     transform: scale(1.04); /* Увеличение кнопок */
 }
 
