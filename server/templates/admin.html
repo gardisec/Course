@@ -189,13 +189,15 @@
     </div>
     
     <script>
-            document.getElementById('showAllContent').addEventListener('click', function () {
-        // Получаем все контейнеры
-        const containers = document.querySelectorAll('.main-content .container');
-        
-        // Удаляем у всех класс active
-        containers.forEach(container => container.classList.remove('active'));
-    });
+
+
+        document.getElementById('showAllContent').addEventListener('click', function () {
+            const containers = document.querySelectorAll('.main-content .container');
+            
+            containers.forEach(container => container.classList.remove('active'));
+            
+            containers.forEach(container => container.style.display = 'block');
+        });
 
         async function openEditStoreModal(productId) {
 

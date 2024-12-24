@@ -645,7 +645,7 @@ def add_store():
         return jsonify({'success': False, 'message': 'Номер склада должен быть целым числом.'})
     
     if (len(city) < 1 or len(city) > 50):
-        return jsonify({'success': False, 'message': 'Название роли должно содержать от 1 до 50 символов.'}), 400
+        return jsonify({'success': False, 'message': 'Название склада должно содержать от 1 до 50 символов.'}), 400
     
     try:
        
