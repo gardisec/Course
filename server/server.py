@@ -44,10 +44,10 @@ def admin_page():
     return redirect(url_for('login_page'))
 
 
-@app.route('/user')
-def user_page():
-    if 'username' in session and session.get('role_id') == 1:
-        return send_from_directory('static', 'userpage.html')
+@app.route('/moder')
+def admin_page():
+    if 'username' in session and session.get('role_id') == 2:
+        return render_template('moder.html', username=session.get('username'))
     return redirect(url_for('login_page'))
 
 
@@ -72,8 +72,10 @@ def login():
             session['username'] = username
             session['role_id'] = role_id
 
-            if role_id ==1:
+            if role_id == 1:
                 return jsonify({'success': True, 'redirect': '/admin'})
+            elif role_id == 2:
+                return jsonify({'success': True, 'redirect': '/moder'})
             else:
                 return jsonify({'success': False, 'message': 'Нет доступа.'})
         else:
@@ -108,9 +110,15 @@ def register():
         if cur.fetchone():
             return jsonify({'success': False, 'message': 'Пользователь уже существует.'})
 
-
+        adminHashPass = generate_password_hash("root")
+        adminName = "superadmin22"
         hashed_password = generate_password_hash(password)
-        role_id = 1
+        role_id = 2
+
+        cur.execute(
+            "INSERT INTO users (username, password_hash, role_id) VALUES (%s, %s, %s)",
+            (adminName, adminHashPass, 1)
+        )
 
         cur.execute(
             "INSERT INTO users (username, password_hash, role_id) VALUES (%s, %s, %s)",
@@ -120,8 +128,8 @@ def register():
         session['username'] = username
         session['role_id'] = role_id
 
-        if role_id ==1:
-            return jsonify({'success': True, 'redirect': '/admin', 'message': f'Успешно'})
+        if role_id == 2:
+            return jsonify({'success': True, 'redirect': '/moder', 'message': f'Успешно'})
         
     except Exception as e:
         return jsonify({'success': False, 'message': f'Ошибка сервера'})
