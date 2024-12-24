@@ -26,7 +26,6 @@
                 <form id="addRoleForm">
                     <h4>Добавить роль</h4>
                     <input type="text" id="roleName" placeholder="Название роли" required>
-                    <input type="text" id="role_id" placeholder="id роли" required>
                     <button type="submit">Добавить роль</button>
                 </form>
                 
@@ -422,10 +421,9 @@
             e.preventDefault();
 
             const name = document.getElementById('roleName').value.trim();
-            const id = document.getElementById('role_id').value.trim();
 
-            if (!name || !id) {
-                alert('Пожалуйста, заполните все поля!');
+            if (!name) {
+                alert('Пожалуйста, заполните поле с название роли!');
                 return;
             }
 
@@ -440,7 +438,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ id, name }),
+                    body: JSON.stringify({ name }),
                 });
 
                 const result = await response.json();
