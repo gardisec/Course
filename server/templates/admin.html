@@ -246,30 +246,50 @@
         document.getElementById('editStoreForm').addEventListener('submit', async function(event) {
             event.preventDefault(); 
 
-            const productId = document.getElementById('modalProductId').value;
-            const city = document.getElementById('modalCity').value;
-            const store = document.getElementById('modalStore').value;
+            const productId = document.getElementById('modalProductId').value.trim();
+            const city = document.getElementById('modalCity').value.trim();
+            const store = document.getElementById('modalStore').value.trim();
 
-            if (!city || !store) {
-                alert('Выберите город и склад.');
+            // Проверка заполненности полей
+            if (!productId || !city || !store) {
+                alert('Пожалуйста, заполните все поля.');
                 return;
             }
 
-            const response = await fetch(`/update_product_store`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, city, store }),
-            });
+            // Проверка на корректность ввода
+            if (isNaN(productId) || parseInt(productId) <= 0) {
+                alert('Некорректный идентификатор товара.');
+                return;
+            }
 
-            if (response.ok) {
-                alert('Склад обновлен успешно!');
-                closeModal();
+            if (isNaN(store) || parseInt(store) <= 0) {
+                alert('Некорректный номер склада.');
+                return;
+            }
 
-                loadProducts();
-            } else {
-                alert('Ошибка при обновлении склада.');
+            try {
+                const response = await fetch(`/update_product_store`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: parseInt(productId), city, store: parseInt(store) }),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message || 'Склад обновлен успешно!');
+                    closeModal();
+                    loadProducts();
+                } else {
+                    alert(result.message || 'Ошибка при обновлении склада.');
+                }
+            } catch (error) {
+                console.error('Ошибка при отправке запроса:', error);
+                alert('Произошла ошибка. Пожалуйста, попробуйте позже.');
             }
         });
+
+
         async function fetchStoreLocations() {
             try {
                 const response = await fetch('/store_locations');
@@ -566,7 +586,7 @@
                 const response = await fetch('/update_user_role', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, role })
+                    body: JSON.stringify({ username, role }),
                 });
 
                 const result = await response.json();
@@ -583,6 +603,7 @@
                 alert('Произошла ошибка. Попробуйте позже.');
             }
         });
+
 
         
         document.getElementById('applyFilters').addEventListener('click', () => {
