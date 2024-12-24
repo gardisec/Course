@@ -66,7 +66,7 @@ CREATE TABLE audit (
 );
 
 CREATE INDEX IF NOT EXISTS idx_store_locations_city_store ON public.store_locations (city, store);
-CREATE INDEX IF NOT EXISTS idx_products_city_store ON public.products (city, store);
+CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products (store_id);
 CREATE INDEX IF NOT EXISTS idx_users_role_id ON public.users (role_id);
 
 INSERT INTO public.roles (name) VALUES ('admin')
