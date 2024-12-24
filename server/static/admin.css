@@ -22,7 +22,16 @@ body {
     height: 100vh;
     position: fixed;
     box-shadow: 8px 0 10px rgba(0, 0, 0, 0.1);
-    background-image: url('https://www.transparenttextures.com/patterns/wood.png'); /* Узор дерева */
+}
+
+.sidebar-image {
+    position: absolute;
+    bottom: 20px; /* Отступ от нижнего края */
+    left: 50%; /* Центровка по горизонтали */
+    transform: translateX(-50%); /* Центровка с учетом ширины изображения */
+    max-width: 80%; /* Уменьшение размера изображения */
+    height: auto;
+    pointer-events: none; /* Избегать взаимодействия с изображением */
 }
 
 .sidebar button, .logout-button {
@@ -121,11 +130,20 @@ td {
 }
 
 /* Поля ввода и кнопки */
-
 .filters input, 
 .filters select, 
 form input, 
 form select, 
+button {
+    margin: 5px 0;
+    padding: 10px;
+    width: 100%;
+    max-width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
 button {
     background-color: #ff4500;
     color: #fff;
