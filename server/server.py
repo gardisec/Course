@@ -739,7 +739,7 @@ def delete_store():
         )
 
         conn.commit()
-        return jsonify({'success': True, 'message': 'Склад успешно удалён.'}), 200
+        return jsonify({'success': True, 'message': 'Склад успешно удалён.'}), 201
     except Exception as e:
         conn.rollback()
         return jsonify({'success': False, 'message': f'Ошибка при удалении склада: {e}'}), 500
