@@ -29,7 +29,7 @@ body {
     padding: 10px;
     background-color: #a099fc; /* Золотистый цвет */
     border: none;
-    color: #dec3ff;/* Красный текст */
+    color: #2e2ece;/* Красный текст */
     text-align: center;
     cursor: pointer;
     border-radius: 10px;
@@ -76,7 +76,7 @@ h2, h3, h4 {
 
 h7 {
     margin-top: 0;
-    color: #dec3ff;
+    color: #2e2ece;
 }
 /* Кнопка выхода */
 
