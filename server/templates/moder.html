@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель модератора</title>
     <link rel="stylesheet" href="/static/admin.css">
-
 </head>
 <body>
-    
     <div class="sidebar">
         <h7>Добро пожаловать, {{username}}</h7>
         <button id="showAllContent">Главная</button>
@@ -18,10 +16,8 @@
     </div>
 
     <div class="main-content">
-
         <div class="container active" id="product-management">
             <h2>Управление товарами</h2>
-
 
             <form id="addProductForm">
                 <h3>Добавить товар</h3>
@@ -30,7 +26,6 @@
                 <input type="number" step="0.01" id="productPrice" placeholder="Цена" required>
                 <select id="productCity" required>
                     <option value="" disabled selected>Выберите город</option>
-
                 </select>
                 <select id="productStore" required>
                     <option value="" disabled selected>Выберите склад</option>
@@ -38,13 +33,11 @@
                 <button type="submit">Добавить товар</button>
             </form>
 
-        
             <div class="filters">
                 <h3>Фильтры</h3>
                 <input type="text" id="filterName" placeholder="Название товара">
                 <select id="filterCity">
                     <option value="">Все города</option>
-
                 </select>
                 <select id="filterStore">
                     <option value="">Все склады</option>
@@ -61,36 +54,36 @@
             <table id="productTable">
                 <thead>
                     <tr>
-                        <th><input type="checkbox" id="selectAll"></th>
                         <th>Город</th>
                         <th>Номер склада</th>
                         <th>Название</th>
                         <th>Количество</th>
                         <th>Цена</th>
+                        <th>Выбор товаров</th>
                     </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
 
+            <h3>Выбор действий для выбранных товаров</h3>
             <div>
                 <button onclick="performAction('add')">Добавить количество</button>
                 <button onclick="performAction('delete')">Удалить количество</button>
-                <button onclick="deleteSelectedProducts()">Удалить полностью</button>
-                <button onclick="editSelectedPrices()">Изменить цены</button>
+                <button onclick="editSelectedPrices()">Изменить цену</button>
+                <button onclick="openEditStoreModal()">Изменить склад</button>
             </div>
         </div>
-        
+
         <div class="container active" id="export">
             <h2>Экспорт данных</h2>
-
-           
             <div class="download-section">
                 <h3>Скачать данные</h3>
                 <button id="downloadCsvButton">Скачать таблицу продуктов</button>
             </div>
         </div>
     </div>
+
     <div id="editStoreModal" class="modal hidden">
         <div class="modal-content">
             <h3>Изменить склад</h3>
@@ -99,14 +92,12 @@
                 <select id="modalCity" required>
                     <option value="" disabled selected>Выберите город</option>
                 </select>
-    
+
                 <label for="modalStore">Склад:</label>
                 <select id="modalStore" required>
                     <option value="" disabled selected>Выберите склад</option>
                 </select>
-    
-                <input type="hidden" id="modalProductId">
-    
+
                 <div class="modal-actions">
                     <button type="submit">Сохранить</button>
                     <button type="button" onclick="closeModal()">Отмена</button>
@@ -114,16 +105,14 @@
             </form>
         </div>
     </div>
-    
-    <div id="contextMenu" class="context-menu">
+
+    <div id="contextMenu" class="context-menu hidden">
         <button onclick="modifyProductFromMenu('add')">Добавить</button>
         <button onclick="modifyProductFromMenu('delete')">Удалить</button>
         <button onclick="editPriceFromMenu()">Изменить цену</button>
-        <button onclick="deleteProductCompletelyFromMenu()">Удалить полностью</button>
+        <button onclick="openEditStoreModalFromMenu()">Изменить склад</button>
     </div>
     <script>
-
-        
         const buttons = document.querySelectorAll('.sidebar button[data-target]');
         const containers = document.querySelectorAll('.container');
 
@@ -140,54 +129,9 @@
             });
         });
 
-        
         document.getElementById('showAllContent').addEventListener('click', () => {
             containers.forEach(container => container.classList.add('active'));
         });
-
-        async function openEditStoreModal(productId) {
-
-            document.getElementById('modalProductId').value = productId;
-
-            const citySelect = document.getElementById('modalCity');
-            citySelect.innerHTML = '<option value="" disabled selected>Выберите город</option>';
-
-            const storeSelect = document.getElementById('modalStore');
-            storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-            storeSelect.disabled = true; 
-
-            const response = await fetch('/store_locations');
-            const storeLocations = await response.json();
-
-            for (const city in storeLocations) {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                citySelect.appendChild(option);
-            }
-
-            citySelect.addEventListener('change', () => {
-                const selectedCity = citySelect.value;
-
-                storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-                if (storeLocations[selectedCity]) {
-                    storeLocations[selectedCity].forEach(store => {
-                        const option = document.createElement('option');
-                        option.value = store;
-                        option.textContent = store;
-                        storeSelect.appendChild(option);
-                    });
-                }
-                storeSelect.disabled = false; 
-            });
-
-            document.getElementById('editStoreModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('editStoreModal').classList.add('hidden');
-        }
-
 
         async function fetchStoreLocations() {
             try {
@@ -197,12 +141,16 @@
 
                     populateCitySelect('productCity', storeLocations);
                     populateCitySelect('filterCity', storeLocations);
+                    populateCitySelect('modalCity', storeLocations);
 
                     document.getElementById('productCity').addEventListener('change', () => {
                         updateStoreSelect('productCity', 'productStore', storeLocations, 'Выберите склад');
                     });
                     document.getElementById('filterCity').addEventListener('change', () => {
                         updateStoreSelect('filterCity', 'filterStore', storeLocations, 'Все склады');
+                    });
+                    document.getElementById('modalCity').addEventListener('change', () => {
+                        updateStoreSelect('modalCity', 'modalStore', storeLocations, 'Выберите склад');
                     });
                 } else {
                     console.error('Ошибка загрузки данных:', response.status);
@@ -241,56 +189,6 @@
 
         document.addEventListener('DOMContentLoaded', fetchStoreLocations);
 
-
-        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('productName').value.trim();
-            const quantity = parseInt(document.getElementById('productQuantity').value, 10);
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const city = document.getElementById('productCity').value;
-            const store = parseInt(document.getElementById('productStore').value, 10);
-            if (quantity > 1000000){
-                alert('Количество товара не может превышать 1.000.000');
-                return;
-            }
-
-            if (price > 1000000){
-                alert('Количество товара не может превышать 1.000.000');
-                return;
-            }
-            const response = await fetch('/add_product', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, quantity, price, city, store })
-            });
-
-            const result = await response.json(); 
-            if (result.success) {
-                alert(result.message);
-                loadProducts(); 
-            } else {
-                alert(result.message);
-            }
-        });
-
-
-        document.getElementById('applyFilters').addEventListener('click', () => {
-            loadProducts();
-        });
-
-
-        document.getElementById('resetFilters').addEventListener('click', () => {
-            document.getElementById('filterName').value = '';
-            document.getElementById('filterCity').value = '';
-            document.getElementById('filterStore').value = '';
-            document.getElementById('filterQuantityMin').value = '';
-            document.getElementById('filterQuantityMax').value = '';
-            document.getElementById('filterPriceMin').value = '';
-            document.getElementById('filterPriceMax').value = '';
-            loadProducts(); 
-        });
-        
-
         async function loadProducts() {
             const params = new URLSearchParams({
                 name: document.getElementById('filterName').value,
@@ -308,17 +206,22 @@
             tableBody.innerHTML = '';
 
             products.forEach(product => {
-                const row = `
-                    <tr>
-                        <td><input type="checkbox" class="product-checkbox" data-id="${product.id}"></td>
-                        <td>${product.city}</td>
-                        <td>${product.store}</td>
-                        <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${product.price}</td>
-                    </tr>
+                const row = document.createElement('tr');
+                row.dataset.productId = product.id;
+
+                row.innerHTML = `
+                    <td>${product.city}</td>
+                    <td>${product.store}</td>
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.price}</td>
+                    <td><input type="checkbox" class="product-checkbox" data-id="${product.id}"></td>
                 `;
-                tableBody.insertAdjacentHTML('beforeend', row);
+
+                // Добавить обработчик для открытия контекстного меню
+                row.addEventListener('contextmenu', (event) => showContextMenu(event, product));
+
+                tableBody.appendChild(row);
             });
         }
 
@@ -352,28 +255,6 @@
             }
         }
 
-        async function deleteSelectedProducts() {
-            const selectedIds = getSelectedProductIds();
-            if (!selectedIds.length) {
-                alert('Выберите хотя бы один товар.');
-                return;
-            }
-
-            if (confirm('Вы уверены, что хотите полностью удалить выбранные товары?')) {
-                const responses = await Promise.all(selectedIds.map(id => fetch(`/delete_product/${id}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                })));
-
-                if (responses.every(res => res.ok)) {
-                    alert('Товары успешно удалены!');
-                    loadProducts();
-                } else {
-                    alert('Ошибка при удалении некоторых товаров.');
-                }
-            }
-        }
-
         async function editSelectedPrices() {
             const selectedIds = getSelectedProductIds();
             if (!selectedIds.length) {
@@ -399,7 +280,54 @@
                 alert('Некорректная цена.');
             }
         }
-        
+
+        document.getElementById('applyFilters').addEventListener('click', () => {
+            loadProducts();
+        });
+        document.getElementById('resetFilters').addEventListener('click', () => {
+            document.getElementById('filterName').value = '';
+            document.getElementById('filterCity').value = '';
+            document.getElementById('filterStore').value = '';
+            document.getElementById('filterQuantityMin').value = '';
+            document.getElementById('filterQuantityMax').value = '';
+            document.getElementById('filterPriceMin').value = '';
+            document.getElementById('filterPriceMax').value = '';
+            loadProducts();
+        });
+
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('productQuantity').value, 10);
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const city = document.getElementById('productCity').value;
+            const store = parseInt(document.getElementById('productStore').value, 10);
+
+            if (quantity > 1000000){
+                alert('Количество товара не может превышать 1.000.000');
+                return;
+            }
+
+            if (price > 1000000){
+                alert('Количество товара не может превышать 1.000.000');
+                return;
+            }
+
+            const response = await fetch('/add_product', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, quantity, price, city, store })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message);
+                loadProducts();
+            } else {
+                alert(result.message);
+            }
+        });
+
         document.getElementById('downloadCsvButton').addEventListener('click', () => {
             fetch('/download-csv?format=excel') // Изменяем параметр format на excel
                 .then(response => {
@@ -420,92 +348,131 @@
                 .catch(error => alert(error.message));
         });
 
-        let currentProductId = null;
-
-function showContextMenu(event, product) {
-    event.preventDefault();
-    currentProductId = product.id;
-
-    const menu = document.getElementById('contextMenu');
-    menu.style.left = `${event.pageX}px`;
-    menu.style.top = `${event.pageY}px`;
-    menu.style.display = 'block';
-
-    document.addEventListener('click', hideContextMenu);
-}
-
-function hideContextMenu() {
-    const menu = document.getElementById('contextMenu');
-    menu.style.display = 'none';
-    document.removeEventListener('click', hideContextMenu);
-}
-
-async function modifyProductFromMenu(action) {
-    hideContextMenu();
-
-    const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
-    if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
-        const response = await fetch(`/modify_product/${currentProductId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action, quantity: Number(quantity) })
-        });
-
-        if (response.ok) {
-            alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
-            loadProducts();
-        } else {
-            alert('Ошибка при изменении количества товара.');
-        }
-    } else {
-        alert('Некорректное количество.');
-    }
-}
-
-async function editPriceFromMenu() {
-    hideContextMenu();
-
-    const newPrice = prompt('Введите новую цену:');
-    if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
-        const response = await fetch(`/update_price/${currentProductId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ price: Number(newPrice) })
-        });
-
-        if (response.ok) {
-            alert('Цена успешно обновлена!');
-            loadProducts();
-        } else {
-            alert('Ошибка при обновлении цены.');
-        }
-    } else {
-        alert('Некорректная цена.');
-    }
-}
-
-async function deleteProductCompletelyFromMenu() {
-    hideContextMenu();
-
-    if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
-        const response = await fetch(`/delete_product/${currentProductId}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        if (response.ok) {
-            alert('Товар успешно удалён!');
-            loadProducts();
-        } else {
-            alert('Ошибка при удалении товара.');
-        }
-    }
-}
-
         loadProducts();
 
+        let currentProductId = null;
+
+        function showContextMenu(event, product) {
+            event.preventDefault();
+            currentProductId = product.id; // Устанавливаем ID текущего товара
+
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${event.pageX}px`;
+            menu.style.top = `${event.pageY}px`;
+            menu.style.display = 'block';
+
+            document.addEventListener('click', hideContextMenu, { once: true });
+        }
+
+        // Скрываем контекстное меню
+        function hideContextMenu() {
+            const menu = document.getElementById('contextMenu');
+            menu.style.display = 'none';
+        }
+
+        async function modifyProductFromMenu(action) {
+            hideContextMenu();
+
+            const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
+            if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
+                const response = await fetch(`/modify_product/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, quantity: Number(quantity) })
+                });
+
+                if (response.ok) {
+                    alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
+                    loadProducts();
+                } else {
+                    alert('Ошибка при изменении количества товара.');
+                }
+            } else {
+                alert('Некорректное количество.');
+            }
+        }
+
+        async function editPriceFromMenu() {
+            hideContextMenu();
+
+            const newPrice = prompt('Введите новую цену:');
+            if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
+                const response = await fetch(`/update_price/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: Number(newPrice) })
+                });
+
+                if (response.ok) {
+                    alert('Цена успешно обновлена!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при обновлении цены.');
+                }
+            } else {
+                alert('Некорректная цена.');
+            }
+        }
+
+        async function deleteProductCompletelyFromMenu() {
+            hideContextMenu();
+
+            if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
+                const response = await fetch(`/delete_product/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    alert('Товар успешно удалён!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при удалении товара.');
+                }
+            }
+        }
+
+        document.querySelectorAll('.product-row').forEach(row => {
+            const productId = row.dataset.productId;
+
+            row.addEventListener('contextmenu', (event) => showContextMenu(event, productId));
+        });
+
+        function openEditStoreModal() {
+            const modal = document.getElementById('editStoreModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('editStoreModal');
+            modal.classList.add('hidden');
+        }
+
+function openEditStoreModalFromMenu() {
+    hideContextMenu();
+    openEditStoreModal();
+}
+
+document.getElementById('editStoreForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const city = document.getElementById('modalCity').value;
+    const store = document.getElementById('modalStore').value;
+
+    const response = await fetch(`/update_product_store`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ city, store, productId: currentProductId })
+    });
+
+    if (response.ok) {
+        alert('Склад успешно обновлен для выбранного товара!');
+        loadProducts();
+        closeModal();
+    } else {
+        alert('Ошибка при обновлении склада товара.');
+    }
+});
 
     </script>
-
 </body>
 </html>

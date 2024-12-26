@@ -420,68 +420,60 @@ def update_price(product_id):
         if conn:
             conn.close()
 
-
 @app.route('/update_product_store', methods=['POST'])
 def update_product_store():
     data = request.json
     city = data.get('city', '').strip()
     product_id = data.get('productId')
-
-    try:
-        store = int(data.get('store', -1))
-        if store <= 0:
-            raise ValueError
-    except (ValueError, TypeError):
-        return jsonify({"error": "Неверный номер склада."}), 400
-
-    try:
-        product_id = int(product_id)
-        if product_id <= 0:
-            raise ValueError
-    except (ValueError, TypeError):
-        return jsonify({"error": "Неверный идентификатор товара."}), 400
+    store = data.get('store')
 
     if not city:
         return jsonify({"error": "Город не указан."}), 400
+    if not product_id:
+        return jsonify({"error": "ID товара не указан."}), 400
+    if store is None:
+        return jsonify({"error": "Номер склада не указан."}), 400
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # Проверка существования товара
         cur.execute("SELECT store_id FROM products WHERE id = %s", (product_id,))
         product_row = cur.fetchone()
         if not product_row:
-            return jsonify({"error": "Товар с указанным идентификатором не найден."}), 404
+            return jsonify({"error": f"Товар с ID {product_id} не найден."}), 404
 
         current_store_id = product_row[0]
 
+        # Проверка существования склада
         cur.execute(
             "SELECT id FROM store_locations WHERE city = %s AND store = %s",
             (city, store)
         )
         store_row = cur.fetchone()
         if not store_row:
-            return jsonify({"error": "Указанный город и склад не существуют."}), 404
+            return jsonify({"error": f"Склад с городом {city} и номером {store} не существует."}), 404
 
         new_store_id = store_row[0]
 
         if current_store_id == new_store_id:
-            return jsonify({"error": "Склад не изменен, текущий склад совпадает с указанным."}), 400
+            return jsonify({"error": "Текущий склад совпадает с указанным."}), 400
 
+        # Обновление склада
         cur.execute(
             "UPDATE products SET store_id = %s, updated_at = CURRENT_TIMESTAMP WHERE id = %s",
             (new_store_id, product_id)
         )
         if cur.rowcount == 0:
-            return jsonify({"error": "Ошибка при обновлении склада."}), 400
+            return jsonify({"error": "Некоторые склады не соответствуют требованиям изменения."}), 400
 
         conn.commit()
-        return jsonify({"message": "Склад обновлен успешно."}), 200
-    except Exception as e:
-        return jsonify({"error": f"Внутренняя ошибка сервера: {str(e)}"}), 500
+        return jsonify({"message": "Склад успешно обновлен."}), 200
     finally:
         if conn:
             conn.close()
+
 
 
 @app.route('/roles', methods=['GET'])

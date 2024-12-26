@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель администратора</title>
     <link rel="stylesheet" href="/static/admin.css">
-
 </head>
 <body>
-    
     <div class="sidebar">
         <h7>Добро пожаловать, {{username}}</h7>
         <button id="showAllContent">Главная</button>
@@ -22,48 +20,40 @@
     <div class="main-content">
         <div class="container active" id="user-management">
             <h2>Управление пользователями и ролями</h2>
+            <h4>Список ролей</h4>
+            <table id="roleTable">
+                <thead>
+                    <tr>
+                        <th>ID роли</th>
+                        <th>Имя роли</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
 
-                <h4>Список ролей</h4>
-                <table id="roleTable">
-                    <thead>
-                        <tr>
-                            <th>ID роли</th>
-                            <th>Имя роли</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                   
-                    </tbody>
-                </table>
+            <form id="updateUserRoleForm">
+                <h4>Изменить роль пользователя</h4>
+                <input type="text" id="username" placeholder="Имя пользователя" required>
+                <select id="userRole" required>
+                    <option value="" disabled selected>Выберите роль</option>
+                </select>
+                <button type="submit">Изменить роль</button>
+            </form>
 
-                <form id="updateUserRoleForm">
-                    <h4>Изменить роль пользователя</h4>
-                    <input type="text" id="username" placeholder="Имя пользователя" required>
-                    <select id="userRole" required>
-                        <option value="" disabled selected>Выберите роль</option>
-                
-                    </select>
-                    <button type="submit">Изменить роль</button>
-                </form>
-        
-                <h4>Список пользователей</h4>
-                <table id="userTable">
-                    <thead>
-                        <tr>
-                            <th>Имя пользователя</th>
-                            <th>Роль</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-             
-                    </tbody>
-                </table>
-            
+            <h4>Список пользователей</h4>
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>Имя пользователя</th>
+                        <th>Роль</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
         </div>
 
         <div class="container active" id="product-management">
             <h2>Управление товарами</h2>
-
 
             <form id="addProductForm">
                 <h3>Добавить товар</h3>
@@ -72,7 +62,6 @@
                 <input type="number" step="0.01" id="productPrice" placeholder="Цена" required>
                 <select id="productCity" required>
                     <option value="" disabled selected>Выберите город</option>
-
                 </select>
                 <select id="productStore" required>
                     <option value="" disabled selected>Выберите склад</option>
@@ -80,13 +69,11 @@
                 <button type="submit">Добавить товар</button>
             </form>
 
-        
             <div class="filters">
                 <h3>Фильтры</h3>
                 <input type="text" id="filterName" placeholder="Название товара">
                 <select id="filterCity">
                     <option value="">Все города</option>
-
                 </select>
                 <select id="filterStore">
                     <option value="">Все склады</option>
@@ -108,40 +95,42 @@
                         <th>Название</th>
                         <th>Количество</th>
                         <th>Цена</th>
-                        <th>Действия</th>
+                        <th><input type="checkbox" id="selectAllProducts"> Выбор товаров</th>
                     </tr>
                 </thead>
-                <tbody>
-                 
-                </tbody>
-                
+                <tbody></tbody>
             </table>
+
+            <h3>Выбор действий для выбранных товаров</h3>
+            <div>
+                <button onclick="performAction('add')">Добавить количество</button>
+                <button onclick="performAction('delete')">Удалить количество</button>
+                <button onclick="deleteSelectedProducts()">Удалить полностью</button>
+                <button onclick="editSelectedPrices()">Изменить цены</button>
+                <button onclick="openEditStoreModal()">Изменить склад</button>
+            </div>
         </div>
 
+        <div class="container active" id="new-points">
+            <h2>Добавление нового склада</h2>
+            <form id="addStore">
+                <h4 for="addCity">Город</h4>
+                <input type="text" id="addCity" name="addCity" placeholder="Введите город" required>
+                <h4 for="addStoreNumber">Номер склада</h4>
+                <input type="text" id="addStoreNumber" name="addStoreNumber" placeholder="Введите номер склада" required>
+                <button type="submit" id="addSubmitButton">Добавить склад</button>
+            </form>
 
-    <div class="container active" id="new-points">
-        <h2>Добавление нового склада</h2>
-        <form id="addStore">
-            <h4 for="addCity">Город</h4>
-            <input type="text" id="addCity" name="addCity" placeholder="Введите город" required>
-        
-            <h4 for="addStoreNumber">Номер склада</h4>
-            <input type="text" id="addStoreNumber" name="addStoreNumber" placeholder="Введите номер склада" required>
-        
-            <button type="submit" id="addSubmitButton">Добавить склад</button>
-        </form>
-        
-        <h2>Удаление склада</h2>
-        <form id="delStore">
-            <h4 for="delCity">Город</h4>
-            <input type="text" id="delCity" name="delCity" placeholder="Введите город" required>
-        
-            <h4 for="delStoreNumber">Номер склада</h4>
-            <input type="text" id="delStoreNumber" name="delStoreNumber" placeholder="Введите номер склада" required>
-        
-            <button type="submit" id="delSubmitButton">Удалить склад</button>
-        </form>
-                <h2>Таблица складов</h2>
+            <h2>Удаление склада</h2>
+            <form id="delStore">
+                <h4 for="delCity">Город</h4>
+                <input type="text" id="delCity" name="delCity" placeholder="Введите город" required>
+                <h4 for="delStoreNumber">Номер склада</h4>
+                <input type="text" id="delStoreNumber" name="delStoreNumber" placeholder="Введите номер склада" required>
+                <button type="submit" id="delSubmitButton">Удалить склад</button>
+            </form>
+
+            <h2>Таблица складов</h2>
             <table id="storeTable">
                 <thead>
                     <tr>
@@ -149,21 +138,19 @@
                         <th>Номер склада</th>
                     </tr>
                 </thead>
-                <tbody>
-         
-                </tbody>
+                <tbody></tbody>
             </table>
-    </div>
+        </div>
+
         <div class="container active" id="export">
             <h2>Экспорт данных</h2>
-
-           
             <div class="download-section">
                 <h3>Скачать данные</h3>
                 <button id="downloadCsvButton">Скачать таблицу продуктов</button>
             </div>
         </div>
     </div>
+
     <div id="editStoreModal" class="modal hidden">
         <div class="modal-content">
             <h3>Изменить склад</h3>
@@ -172,14 +159,10 @@
                 <select id="modalCity" required>
                     <option value="" disabled selected>Выберите город</option>
                 </select>
-    
                 <label for="modalStore">Склад:</label>
                 <select id="modalStore" required>
                     <option value="" disabled selected>Выберите склад</option>
                 </select>
-    
-                <input type="hidden" id="modalProductId">
-    
                 <div class="modal-actions">
                     <button type="submit">Сохранить</button>
                     <button type="button" onclick="closeModal()">Отмена</button>
@@ -187,11 +170,15 @@
             </form>
         </div>
     </div>
-    
 
+    <div id="contextMenu" class="context-menu hidden">
+        <button onclick="modifyProductFromMenu('add')">Добавить</button>
+        <button onclick="modifyProductFromMenu('delete')">Удалить</button>
+        <button onclick="editPriceFromMenu()">Изменить цену</button>
+        <button onclick="deleteProductCompletelyFromMenu()">Удалить полностью</button>
+        <button onclick="openEditStoreModalFromMenu()">Изменить склад</button>
+    </div>
     <script>
-
-
         const buttons = document.querySelectorAll('.sidebar button[data-target]');
         const containers = document.querySelectorAll('.container');
 
@@ -208,85 +195,8 @@
             });
         });
 
-
         document.getElementById('showAllContent').addEventListener('click', () => {
             containers.forEach(container => container.classList.add('active'));
-        });
-
-        async function openEditStoreModal(productId) {
-
-            document.getElementById('modalProductId').value = productId;
-
-            const citySelect = document.getElementById('modalCity');
-            citySelect.innerHTML = '<option value="" disabled selected>Выберите город</option>';
-
-            const storeSelect = document.getElementById('modalStore');
-            storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-            storeSelect.disabled = true; 
-
-            const response = await fetch('/store_locations');
-            const storeLocations = await response.json();
-
-            for (const city in storeLocations) {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                citySelect.appendChild(option);
-            }
-
-            citySelect.addEventListener('change', () => {
-                const selectedCity = citySelect.value;
-
-                storeSelect.innerHTML = '<option value="" disabled selected>Выберите склад</option>';
-                if (storeLocations[selectedCity]) {
-                    storeLocations[selectedCity].forEach(store => {
-                        const option = document.createElement('option');
-                        option.value = store;
-                        option.textContent = store;
-                        storeSelect.appendChild(option);
-                    });
-                }
-                storeSelect.disabled = false; 
-            });
-
-            document.getElementById('editStoreModal').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('editStoreModal').classList.add('hidden');
-        }
-
-        document.getElementById('editStoreForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); 
-
-            const productId = document.getElementById('modalProductId').value;
-            const city = document.getElementById('modalCity').value;
-            const store = document.getElementById('modalStore').value;
-
-            if (!city || !store) {
-                alert('Выберите город и склад.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/update_product_store`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId, city, store }),
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(result.message || 'Склад обновлен успешно!');
-                    closeModal();
-                    loadProducts();
-                } else {
-                    alert(result.error || 'Ошибка при обновлении склада.');
-                }
-            } catch (error) {
-                alert(`Произошла ошибка: ${error.message}`);
-            }
         });
 
         async function fetchStoreLocations() {
@@ -297,12 +207,16 @@
 
                     populateCitySelect('productCity', storeLocations);
                     populateCitySelect('filterCity', storeLocations);
+                    populateCitySelect('modalCity', storeLocations);
 
                     document.getElementById('productCity').addEventListener('change', () => {
                         updateStoreSelect('productCity', 'productStore', storeLocations, 'Выберите склад');
                     });
                     document.getElementById('filterCity').addEventListener('change', () => {
                         updateStoreSelect('filterCity', 'filterStore', storeLocations, 'Все склады');
+                    });
+                    document.getElementById('modalCity').addEventListener('change', () => {
+                        updateStoreSelect('modalCity', 'modalStore', storeLocations, 'Выберите склад');
                     });
                 } else {
                     console.error('Ошибка загрузки данных:', response.status);
@@ -339,9 +253,6 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', fetchStoreLocations);
-
-
         async function loadProducts() {
             const params = new URLSearchParams({
                 name: document.getElementById('filterName').value,
@@ -359,83 +270,24 @@
             tableBody.innerHTML = '';
 
             products.forEach(product => {
-                const row = `
-                    <tr>
-                        <td>${product.city}</td>
-                        <td>${product.store}</td>
-                        <td>${product.name}</td>
-                        <td>${product.quantity}</td>
-                        <td>${product.price}</td>
-                        <td>
-                            <button class="add" onclick="modifyProduct(${product.id}, 'add')">Добавить</button>
-                            <button class="edit-price" onclick="editPrice(${product.id})">Изменить цену</button>
-                            <button class="delete" onclick="modifyProduct(${product.id}, 'delete')">Удалить</button>
-                            <button class="delete" onclick="deleteProductCompletely(${product.id})">Удалить полностью</button>
-                            <button class="edit-store-btn" onclick="openEditStoreModal(${product.id})">Изменить склад</button>
+                const row = document.createElement('tr');
+                row.dataset.productId = product.id;
 
-                        </td>
-                    </tr>
+                row.innerHTML = `
+                    <td>${product.city}</td>
+                    <td>${product.store}</td>
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.price}</td>
+                    <td><input type="checkbox" class="product-checkbox" data-id="${product.id}"></td>
                 `;
-                tableBody.insertAdjacentHTML('beforeend', row);
+
+                // Добавить обработчик для открытия контекстного меню
+                row.addEventListener('contextmenu', (event) => showContextMenu(event, product));
+
+                tableBody.appendChild(row);
             });
         }
-
-        async function modifyProduct(productId, action) {
-            const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
-            if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
-                const response = await fetch(`/modify_product/${productId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action, quantity: Number(quantity) })
-                });
-
-                if (response.ok) {
-                    alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
-                    loadProducts();
-                } else {
-                    alert('Ошибка при изменении количества товара.');
-                }
-            } else {
-                alert('Некорректное количество.');
-            }
-        }
-
-        async function deleteProductCompletely(productId) {
-            if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
-                const response = await fetch(`/delete_product/${productId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                if (response.ok) {
-                    alert('Товар успешно удалён!');
-                    loadProducts();
-                } else {
-                    alert('Ошибка при удалении товара.');
-                }
-            }
-        }
-
-        async function editPrice(productId) {
-            const newPrice = prompt('Введите новую цену:');
-            if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
-                const response = await fetch(`/update_price/${productId}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ price: Number(newPrice) })
-                });
-
-                if (response.ok) {
-                    alert('Цена успешно обновлена!');
-                    loadProducts();
-                } else {
-                    alert('Ошибка при обновлении цены.');
-                }
-            } else {
-                alert('Некорректная цена.');
-            }
-        }
-
 
         async function loadRoles() {
             try {
@@ -479,7 +331,7 @@
                 const users = await response.json();
 
                 const tableBody = document.getElementById('userTable').querySelector('tbody');
-                tableBody.innerHTML = ''; 
+                tableBody.innerHTML = '';
 
                 users.forEach(user => {
                     const row = `
@@ -496,7 +348,6 @@
             }
         }
 
-        
         document.getElementById('updateUserRoleForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -519,8 +370,8 @@
 
                 if (response.ok && result.success) {
                     alert(result.message || 'Роль пользователя успешно изменена!');
-                    document.getElementById('updateUserRoleForm').reset(); 
-                    loadUsers(); 
+                    document.getElementById('updateUserRoleForm').reset();
+                    loadUsers();
                 } else {
                     alert(result.message || 'Ошибка при изменении роли.');
                 }
@@ -530,7 +381,6 @@
             }
         });
 
-        
         document.getElementById('applyFilters').addEventListener('click', () => {
             loadProducts();
         });
@@ -542,9 +392,9 @@
             document.getElementById('filterQuantityMax').value = '';
             document.getElementById('filterPriceMin').value = '';
             document.getElementById('filterPriceMax').value = '';
-            loadProducts(); 
+            loadProducts();
         });
-        
+
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('productName').value.trim();
@@ -569,19 +419,15 @@
                 body: JSON.stringify({ name, quantity, price, city, store })
             });
 
-            const result = await response.json(); 
+            const result = await response.json();
             if (result.success) {
                 alert(result.message);
-                loadProducts(); 
+                loadProducts();
             } else {
                 alert(result.message);
             }
         });
 
-        loadRoles();
-        loadUsers();
-        loadProducts();
-        
         document.getElementById('downloadCsvButton').addEventListener('click', () => {
             fetch('/download-csv?format=excel') // Изменяем параметр format на excel
                 .then(response => {
@@ -601,9 +447,7 @@
                 })
                 .catch(error => alert(error.message));
         });
-        
 
-        
         document.getElementById('addStore').addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -637,8 +481,8 @@
                 if (response.ok) {
                     alert(result.message || 'Склад успешно добавлен');
                     loadStoreTable();
-                    fetchStoreLocations(); 
-                    document.getElementById('addStore').reset(); 
+                    fetchStoreLocations();
+                    document.getElementById('addStore').reset();
                 } else {
                     alert(result.message || 'Ошибка при добавлении склада');
                 }
@@ -648,7 +492,6 @@
             }
         });
 
-   
         document.getElementById('delStore').addEventListener('submit', async (event) => {
             event.preventDefault();
 
@@ -682,10 +525,10 @@
                     const responseData = await response.json();
                     if (responseData.success) {
                         alert(responseData.message || 'Склад успешно удалён.');
-                        loadStoreTable(); 
-                        fetchStoreLocations(); 
-                        loadProducts(); 
-                        document.getElementById('delStore').reset(); 
+                        loadStoreTable();
+                        fetchStoreLocations();
+                        loadProducts();
+                        document.getElementById('delStore').reset();
                     } else {
                         alert(responseData.message || 'Ошибка при удалении склада.');
                     }
@@ -699,34 +542,245 @@
             }
         });
 
+        async function loadStoreTable() {
+            try {
+                const response = await fetch('/get_stores');
+                if (!response.ok) throw new Error('Ошибка загрузки списка складов');
 
-    async function loadStoreTable() {
-        try {
-            const response = await fetch('/get_stores'); 
-            if (!response.ok) throw new Error('Ошибка загрузки списка складов');
+                const stores = await response.json();
 
-            const stores = await response.json();
+                const tableBody = document.getElementById('storeTable').querySelector('tbody');
+                tableBody.innerHTML = '';
 
-            const tableBody = document.getElementById('storeTable').querySelector('tbody');
-            tableBody.innerHTML = ''; 
-
-            stores.forEach(store => {
-                const row = `
-                    <tr>
-                        <td>${store.city}</td>
-                        <td>${store.store}</td>
-                    </tr>
-                `;
-                tableBody.insertAdjacentHTML('beforeend', row); 
-            });
-        } catch (error) {
-            console.error('Ошибка загрузки таблицы:', error);
-            alert('Не удалось загрузить данные складов.');
+                stores.forEach(store => {
+                    const row = `
+                        <tr>
+                            <td>${store.city}</td>
+                            <td>${store.store}</td>
+                        </tr>
+                    `;
+                    tableBody.insertAdjacentHTML('beforeend', row);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки таблицы:', error);
+                alert('Не удалось загрузить данные складов.');
+            }
         }
-    }
 
-    loadStoreTable();
+        function getSelectedProductIds() {
+            return Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.dataset.id);
+        }
+
+        async function performAction(action) {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
+            const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
+            if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/modify_product/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, quantity: Number(quantity) })
+                })));
+
+                if (responses.every(res => res.ok)) {
+                    alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
+                    loadProducts();
+                } else {
+                    alert('Ошибка при изменении количества некоторых товаров.');
+                }
+            } else {
+                alert('Некорректное количество.');
+            }
+        }
+
+        async function deleteSelectedProducts() {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
+            if (confirm('Вы уверены, что хотите полностью удалить выбранные товары?')) {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/delete_product/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })));
+
+                if (responses.every(res => res.ok)) {
+                    alert('Товары успешно удалены!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при удалении некоторых товаров.');
+                }
+            }
+        }
+
+        async function editSelectedPrices() {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
+            const newPrice = prompt('Введите новую цену:');
+            if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/update_price/${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: Number(newPrice) })
+                })));
+
+                if (responses.every(res => res.ok)) {
+                    alert('Цены успешно обновлены!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при обновлении цен некоторых товаров.');
+                }
+            } else {
+                alert('Некорректная цена.');
+            }
+        }
+
+        let currentProductId = null;
+
+        function showContextMenu(event, product) {
+            event.preventDefault();
+            currentProductId = product.id; // Устанавливаем ID текущего товара
+
+            const menu = document.getElementById('contextMenu');
+            menu.style.left = `${event.pageX}px`;
+            menu.style.top = `${event.pageY}px`;
+            menu.style.display = 'block';
+
+            document.addEventListener('click', hideContextMenu, { once: true });
+        }
+
+        // Скрываем контекстное меню
+        function hideContextMenu() {
+            const menu = document.getElementById('contextMenu');
+            menu.style.display = 'none';
+        }
+
+        async function modifyProductFromMenu(action) {
+            hideContextMenu();
+
+            const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
+            if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
+                const response = await fetch(`/modify_product/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action, quantity: Number(quantity) })
+                });
+
+                if (response.ok) {
+                    alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
+                    loadProducts();
+                } else {
+                    alert('Ошибка при изменении количества товара.');
+                }
+            } else {
+                alert('Некорректное количество.');
+            }
+        }
+
+        async function editPriceFromMenu() {
+            hideContextMenu();
+
+            const newPrice = prompt('Введите новую цену:');
+            if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
+                const response = await fetch(`/update_price/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ price: Number(newPrice) })
+                });
+
+                if (response.ok) {
+                    alert('Цена успешно обновлена!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при обновлении цены.');
+                }
+            } else {
+                alert('Некорректная цена.');
+            }
+        }
+
+        async function deleteProductCompletelyFromMenu() {
+            hideContextMenu();
+
+            if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
+                const response = await fetch(`/delete_product/${currentProductId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                if (response.ok) {
+                    alert('Товар успешно удалён!');
+                    loadProducts();
+                } else {
+                    alert('Ошибка при удалении товара.');
+                }
+            }
+        }
+
+        function openEditStoreModal() {
+            const modal = document.getElementById('editStoreModal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('editStoreModal');
+            modal.classList.add('hidden');
+        }
+
+        function openEditStoreModalFromMenu() {
+            hideContextMenu();
+            openEditStoreModal();
+        }
+
+        document.getElementById('editStoreForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const city = document.getElementById('modalCity').value;
+            const store = document.getElementById('modalStore').value;
+
+            const response = await fetch(`/update_product_store`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ city, store, productId: currentProductId })
+            });
+
+            if (response.ok) {
+                alert('Склад успешно обновлен для выбранного товара!');
+                loadProducts();
+                closeModal();
+            } else {
+                alert('Ошибка при обновлении склада товара.');
+            }
+        });
+
+        document.getElementById('selectAllProducts').addEventListener('change', function() {
+            const isChecked = this.checked;
+            document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = document.querySelectorAll('.product-checkbox:checked').length === document.querySelectorAll('.product-checkbox').length;
+                document.getElementById('selectAllProducts').checked = allChecked;
+            });
+        });
+
+        loadRoles();
+        loadUsers();
+        loadProducts();
+        loadStoreTable();
+        fetchStoreLocations();
     </script>
-
 </body>
 </html>

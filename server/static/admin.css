@@ -209,21 +209,30 @@ button:hover {
 
 .context-menu {
     position: absolute;
-    display: none;
+    display: none; /* Скрыто по умолчанию */
     background: white;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     z-index: 1000;
+    border-radius: 4px;
+    overflow: hidden; /* Убедимся, что кнопки не выходят за границы меню */
+    width: 200px; /* Увеличиваем ширину окна */
 }
+
 .context-menu button {
+    background-color: white; /* Белый фон */
+    color: black; /* Черный текст */
     display: block;
     width: 100%;
     padding: 10px;
     text-align: left;
     border: none;
-    background: none;
     cursor: pointer;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    font-size: 14px; /* Удобный размер текста */
 }
+
 .context-menu button:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* Светло-серый фон при наведении */
+    transform: scale(1.05); /* Увеличение кнопки */
 }
