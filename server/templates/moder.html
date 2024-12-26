@@ -73,12 +73,11 @@
                 </tbody>
             </table>
 
-            <div class="bulk-actions">
-                <button class="bulk-add">Добавить количество</button>
-                <button class="bulk-edit-price">Изменить цену</button>
-                <button class="bulk-delete">Удалить</button>
-                <button class="bulk-delete-complete">Удалить полностью</button>
-                <button class="bulk-edit-store">Изменить склад</button>
+            <div>
+                <button onclick="performAction('add')">Добавить количество</button>
+                <button onclick="performAction('delete')">Удалить количество</button>
+                <button onclick="deleteSelectedProducts()">Удалить полностью</button>
+                <button onclick="editSelectedPrices()">Изменить цены</button>
             </div>
         </div>
         
@@ -305,114 +304,95 @@
             products.forEach(product => {
                 const row = `
                     <tr>
+                        <td><input type="checkbox" class="product-checkbox" data-id="${product.id}"></td>
                         <td>${product.city}</td>
                         <td>${product.store}</td>
                         <td>${product.name}</td>
                         <td>${product.quantity}</td>
                         <td>${product.price}</td>
-                        <td>
-                            <button class="add" onclick="modifyProduct(${product.id}, 'add')">Добавить</button>
-                            <button class="edit-price" onclick="editPrice(${product.id})">Изменить цену</button>
-                            <button class="delete" onclick="modifyProduct(${product.id}, 'delete')">Удалить</button>
-                            <button class="delete" onclick="deleteProductCompletely(${product.id})">Удалить полностью</button>
-                            <button class="edit-store-btn" onclick="openEditStoreModal(${product.id})">Изменить склад</button>
-
-                        </td>
                     </tr>
                 `;
                 tableBody.insertAdjacentHTML('beforeend', row);
             });
         }
 
-        async function modifyProduct(productId, action) {
+        function getSelectedProductIds() {
+            return Array.from(document.querySelectorAll('.product-checkbox:checked')).map(cb => cb.dataset.id);
+        }
+
+        async function performAction(action) {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
             const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
             if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
-                const response = await fetch(`/modify_product/${productId}`, {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/modify_product/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action, quantity: Number(quantity) })
-                });
+                })));
 
-                if (response.ok) {
+                if (responses.every(res => res.ok)) {
                     alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
                     loadProducts();
                 } else {
-                    alert('Ошибка при изменении количества товара.');
+                    alert('Ошибка при изменении количества некоторых товаров.');
                 }
             } else {
                 alert('Некорректное количество.');
             }
         }
 
-        async function deleteProductCompletely(productId) {
-            if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
-                const response = await fetch(`/delete_product/${productId}`, {
+        async function deleteSelectedProducts() {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
+            if (confirm('Вы уверены, что хотите полностью удалить выбранные товары?')) {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/delete_product/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
-                });
+                })));
 
-                if (response.ok) {
-                    alert('Товар успешно удалён!');
+                if (responses.every(res => res.ok)) {
+                    alert('Товары успешно удалены!');
                     loadProducts();
                 } else {
-                    alert('Ошибка при удалении товара.');
+                    alert('Ошибка при удалении некоторых товаров.');
                 }
             }
         }
 
-        async function editPrice(productId) {
+        async function editSelectedPrices() {
+            const selectedIds = getSelectedProductIds();
+            if (!selectedIds.length) {
+                alert('Выберите хотя бы один товар.');
+                return;
+            }
+
             const newPrice = prompt('Введите новую цену:');
             if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
-                const response = await fetch(`/update_price/${productId}`, {
+                const responses = await Promise.all(selectedIds.map(id => fetch(`/update_price/${id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ price: Number(newPrice) })
-                });
+                })));
 
-                if (response.ok) {
-                    alert('Цена успешно обновлена!');
+                if (responses.every(res => res.ok)) {
+                    alert('Цены успешно обновлены!');
                     loadProducts();
                 } else {
-                    alert('Ошибка при обновлении цены.');
+                    alert('Ошибка при обновлении цен некоторых товаров.');
                 }
             } else {
                 alert('Некорректная цена.');
             }
         }
-        
-        document.getElementById('editStoreForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); 
-
-            const productId = document.getElementById('modalProductId').value;
-            const city = document.getElementById('modalCity').value;
-            const store = document.getElementById('modalStore').value;
-
-            if (!city || !store) {
-                alert('Выберите город и склад.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/update_product_store`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ productId, city, store }),
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert(result.message || 'Склад обновлен успешно!');
-                    closeModal();
-                    loadProducts();
-                } else {
-                    alert(result.error || 'Ошибка при обновлении склада.');
-                }
-            } catch (error) {
-                alert(`Произошла ошибка: ${error.message}`);
-            }
-        });
-
         
         document.getElementById('downloadCsvButton').addEventListener('click', () => {
             fetch('/download-csv?format=excel') // Изменяем параметр format на excel
