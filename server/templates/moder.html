@@ -61,19 +61,25 @@
             <table id="productTable">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
                         <th>Город</th>
                         <th>Номер склада</th>
                         <th>Название</th>
                         <th>Количество</th>
                         <th>Цена</th>
-                        <th>Действия</th>
                     </tr>
                 </thead>
                 <tbody>
-                 
                 </tbody>
-                
             </table>
+
+            <div class="bulk-actions">
+                <button class="bulk-add">Добавить количество</button>
+                <button class="bulk-edit-price">Изменить цену</button>
+                <button class="bulk-delete">Удалить</button>
+                <button class="bulk-delete-complete">Удалить полностью</button>
+                <button class="bulk-edit-store">Изменить склад</button>
+            </div>
         </div>
         
         <div class="container active" id="export">
