@@ -115,6 +115,12 @@
         </div>
     </div>
     
+    <div id="contextMenu" class="context-menu">
+        <button onclick="modifyProductFromMenu('add')">Добавить</button>
+        <button onclick="modifyProductFromMenu('delete')">Удалить</button>
+        <button onclick="editPriceFromMenu()">Изменить цену</button>
+        <button onclick="deleteProductCompletelyFromMenu()">Удалить полностью</button>
+    </div>
     <script>
 
         
@@ -414,7 +420,87 @@
                 .catch(error => alert(error.message));
         });
 
-    
+        let currentProductId = null;
+
+function showContextMenu(event, product) {
+    event.preventDefault();
+    currentProductId = product.id;
+
+    const menu = document.getElementById('contextMenu');
+    menu.style.left = `${event.pageX}px`;
+    menu.style.top = `${event.pageY}px`;
+    menu.style.display = 'block';
+
+    document.addEventListener('click', hideContextMenu);
+}
+
+function hideContextMenu() {
+    const menu = document.getElementById('contextMenu');
+    menu.style.display = 'none';
+    document.removeEventListener('click', hideContextMenu);
+}
+
+async function modifyProductFromMenu(action) {
+    hideContextMenu();
+
+    const quantity = prompt(`Введите количество для ${action === 'add' ? 'добавления' : 'удаления'}:`);
+    if (quantity && !isNaN(quantity) && Number(quantity) > 0) {
+        const response = await fetch(`/modify_product/${currentProductId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, quantity: Number(quantity) })
+        });
+
+        if (response.ok) {
+            alert(`Количество успешно ${action === 'add' ? 'добавлено' : 'уменьшено'}!`);
+            loadProducts();
+        } else {
+            alert('Ошибка при изменении количества товара.');
+        }
+    } else {
+        alert('Некорректное количество.');
+    }
+}
+
+async function editPriceFromMenu() {
+    hideContextMenu();
+
+    const newPrice = prompt('Введите новую цену:');
+    if (newPrice && !isNaN(newPrice) && Number(newPrice) > 0) {
+        const response = await fetch(`/update_price/${currentProductId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ price: Number(newPrice) })
+        });
+
+        if (response.ok) {
+            alert('Цена успешно обновлена!');
+            loadProducts();
+        } else {
+            alert('Ошибка при обновлении цены.');
+        }
+    } else {
+        alert('Некорректная цена.');
+    }
+}
+
+async function deleteProductCompletelyFromMenu() {
+    hideContextMenu();
+
+    if (confirm('Вы уверены, что хотите полностью удалить этот товар?')) {
+        const response = await fetch(`/delete_product/${currentProductId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (response.ok) {
+            alert('Товар успешно удалён!');
+            loadProducts();
+        } else {
+            alert('Ошибка при удалении товара.');
+        }
+    }
+}
 
         loadProducts();
 
