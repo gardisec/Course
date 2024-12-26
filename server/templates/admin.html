@@ -103,9 +103,9 @@
 
             <h3>Выбор действий для выбранных товаров</h3>
             <div>
-                <button onclick="performAction('add')">Добавить количество</button>
-                <button onclick="performAction('delete')">Удалить количество</button>
-                <button onclick="deleteSelectedProducts()">Удалить полностью</button>
+                <button onclick="performAction('add')">Увеличить(число товара)</button>
+                <button onclick="performAction('delete')">Уменьшить(число товара)</button>
+                <button onclick="deleteSelectedProducts()">Удалить</button>
                 <button onclick="editSelectedPrices()">Изменить цены</button>
                 <button onclick="openEditStoreModal()">Изменить склад</button>
             </div>
@@ -172,10 +172,10 @@
     </div>
 
     <div id="contextMenu" class="context-menu hidden">
-        <button onclick="modifyProductFromMenu('add')">Добавить</button>
-        <button onclick="modifyProductFromMenu('delete')">Удалить</button>
+        <button onclick="modifyProductFromMenu('add')">Увеличить(число товара)</button>
+        <button onclick="modifyProductFromMenu('delete')">Уменьшить(число товара)</button>
         <button onclick="editPriceFromMenu()">Изменить цену</button>
-        <button onclick="deleteProductCompletelyFromMenu()">Удалить полностью</button>
+        <button onclick="deleteProductCompletelyFromMenu()">Удалить</button>
         <button onclick="openEditStoreModalFromMenu()">Изменить склад</button>
     </div>
     <script>
